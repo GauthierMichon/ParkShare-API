@@ -22,11 +22,11 @@ class PingResource {
     @Produces(MediaType.APPLICATION_JSON)
     fun ping(): Response {
         val status = "OK"
-        val payload = "{status: 'OK'}"
+        val pingResponse = PingResponse(status)
 
         return Response
                 .status(if (status == "OK") 200 else 500)
-                .entity(payload)
+                .entity(pingResponse)
                 .build()
     }
 }

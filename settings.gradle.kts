@@ -8,6 +8,7 @@ pluginManagement {
     }
     plugins {
         id(quarkusPluginId) version quarkusPluginVersion
+        id("org.jetbrains.kotlin.plugin.serialization") version "1.6.10"
     }
 }
 rootProject.name="park-share"
