@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: my_postgres_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ParkShareDatabase
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    networks:
+      - my_network
+
+  adminer:
+    image: adminer
+    container_name: my_adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db
+    networks:
+      - my_network
+
+networks:
+  my_network:
+    driver: bridge
