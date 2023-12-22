@@ -17,4 +17,13 @@ class GreetingResourceTest {
              .body(`is`("Hello from RESTEasy Reactive"))
     }
 
+    @Test
+    fun testPingEndpoint() {
+        given()
+            .`when`().get("/api/ping")
+            .then()
+                .statusCode(200)
+                .body(`is`("{\"status\":\"OK\"}"))
+    }
+
 }
