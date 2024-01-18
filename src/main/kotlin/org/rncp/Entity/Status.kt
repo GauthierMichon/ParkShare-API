@@ -1,13 +1,15 @@
 package org.rncp.Entity
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.persistence.Entity
+import jakarta.persistence.Id
 
 @Entity
 data class Status(
+        @Id
         var status_id: Int,
         var value: String,
-) : PanacheEntity() {
+) : PanacheEntityBase() {
     constructor() : this(0, "")
 }
 
