@@ -5,5 +5,13 @@ import jakarta.persistence.Entity
 
 @Entity
 data class Announcement(
-        var commentaire: String? = null
-) : PanacheEntity()
+        var annoucement_id: Int,
+        var user_id: Int,
+        var name: String,
+        var description: String,
+        var hour_price: Float,
+        var latitude: String,
+        var longitude: String
+) : PanacheEntity() {
+    constructor() : this(0, 0, "", "", 0.0f, "", "")
+}
