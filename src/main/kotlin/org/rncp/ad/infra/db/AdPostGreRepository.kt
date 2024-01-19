@@ -9,7 +9,7 @@ import org.rncp.ad.domain.ports.out.AdRepository
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     override fun createAd(ad: Ad) {
-        val adDao = AdDao(ad.ad_id, ad.user_id, ad.name, ad.description, ad.hour_price, ad.latitude, ad.longitude)
+        val adDao = AdDao(null, ad.user_id, ad.name, ad.description, ad.hour_price, ad.latitude, ad.longitude)
         persist(adDao)
     }
 
