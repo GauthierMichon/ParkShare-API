@@ -1,13 +1,16 @@
-package org.rncp.Entity
+package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
+import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import kotlinx.serialization.Serializable
 
 @Entity
-data class Announcement(
+@Serializable
+data class AdDao(
         @Id
-        var annoucement_id: Int,
+        var ad_id: Int,
         var user_id: Int,
         var name: String,
         var description: String,
