@@ -5,12 +5,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Ad(
         var ad_id: Int,
-        var user_id: Int,
-        var name: String,
-        var description: String,
-        var hour_price: Float,
-        var latitude: String,
-        var longitude: String
+        var user_id: Int?,
+        var name: String?,
+        var description: String?,
+        var hour_price: Float?,
+        var latitude: String?,
+        var longitude: String?,
+        var state: Boolean?
 ) {
-    constructor() : this(0, 0, "", "", 0.0f, "", "")
+    constructor() : this(0, 0, "", "", 0.0f, "", "", false)
 }

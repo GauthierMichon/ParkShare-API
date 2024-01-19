@@ -6,37 +6,35 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.rncp.ad.domain.model.Ad
-import org.rncp.ad.domain.ports.`in`.CreateUseCase
-import org.rncp.ad.domain.ports.`in`.DeleteUseCase
-import org.rncp.ad.infra.db.AdPostGreRepository
+import org.rncp.ad.domain.ports.`in`.*
 
 @Path("/api/ads")
 class AdResource {
 
     @Inject
-    lateinit var adRepository: AdPostGreRepository // TODO : remove
-    
-    @Inject
     lateinit var deleteUseCase: DeleteUseCase
     @Inject
     lateinit var createUseCase: CreateUseCase
+    @Inject
+    lateinit var getAllUseCase: GetAllUseCase
+    @Inject
+    lateinit var getOneUseCase: GetByIdUseCase
+    @Inject
+    lateinit var patchUseCase: PatchUseCase
 
-    /*@GET
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllAds(): List<AdDto> {
-        val ads = adRepository.listAll()
-        return ads.map { ad ->
-            val link = "/api/ads/${ad.ad_id}"
-            AdDto(ad, link)
-        }
+        return getAllUseCase.execute()
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAdById(@PathParam("id") adId: Int): Ad? {
-        return adRepository.findById(adId)
-    }*/
+        // TODO : Gérer si l'id n'existe pas
+        return getOneUseCase.execute(adId)
+    }
 
     @POST
     @Transactional
@@ -47,23 +45,22 @@ class AdResource {
         return Response.status(Response.Status.CREATED).entity(ad).build()
     }
 
-    /*@PATCH
+    @PATCH
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun patchAd(@PathParam("id") adId: Int): Ad? {
-        // TODO
-        return adRepository.findById(adId)
+    fun patchAd(@PathParam("id") adId: Int, updatedAd: Ad): Response {
+        return patchUseCase.execute(adId, updatedAd)
     }
 
-    @POST
+    /*@POST
     @Path("/{id}/publish")
     @Produces(MediaType.APPLICATION_JSON)
     fun postPublish(@PathParam("id") adId: Int): Ad? {
         // TODO
         return adRepository.findById(adId)
-    }
+    }*/
 
-    @POST
+    /*@POST
     @Path("/{id}/unpublish")
     @Produces(MediaType.APPLICATION_JSON)
     fun postUnpublish(@PathParam("id") adId: Int): Ad? {
