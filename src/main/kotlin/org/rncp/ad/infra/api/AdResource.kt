@@ -13,19 +13,27 @@ class AdResource {
 
     @Inject
     lateinit var deleteUseCase: DeleteUseCase
+
     @Inject
     lateinit var createUseCase: CreateUseCase
+
     @Inject
     lateinit var getAllUseCase: GetAllUseCase
+
     @Inject
     lateinit var getOneUseCase: GetByIdUseCase
+
     @Inject
     lateinit var patchUseCase: PatchUseCase
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllAds(): List<AdDto> {
-        return getAllUseCase.execute()
+        val ads = getAllUseCase.execute()
+        return ads.map { ad ->
+            val link = "/api/ads/${ad.user_id}"
+            AdDto(ad.ad_id, ad.user_id, ad.name, ad.description, ad.hour_price, ad.latitude, ad.longitude, ad.state!!, link)
+        }
     }
 
     @GET
@@ -40,7 +48,8 @@ class AdResource {
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    fun createAd(ad: Ad): Response {
+    fun createAd(adDto: AdDto): Response {
+        val ad = Ad(adDto.ad_id, adDto.user_id, adDto.name, adDto.description, adDto.hour_price, adDto.latitude, adDto.longitude, adDto.state)
         createUseCase.execute(ad)
         return Response.status(Response.Status.CREATED).entity(ad).build()
     }
@@ -48,7 +57,9 @@ class AdResource {
     @PATCH
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun patchAd(@PathParam("id") adId: Int, updatedAd: Ad): Response {
+    fun patchAd(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
+        val updatedAd = Ad(updatedAdDto.ad_id, updatedAdDto.user_id, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hour_price, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
+
         return patchUseCase.execute(adId, updatedAd)
     }
 

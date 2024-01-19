@@ -13,11 +13,7 @@ class GetAllUseCase {
     @Inject
     lateinit var adRepository: AdRepository
 
-    fun execute(): List<AdDto> {
-        val ads = adRepository.getAllAds()
-        return ads.map { ad ->
-            val link = "/api/ads/${ad.user_id}"
-            AdDto(ad, link)
-        }
+    fun execute(): List<Ad> {
+        return adRepository.getAllAds()
     }
 }
