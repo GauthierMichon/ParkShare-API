@@ -9,7 +9,6 @@ import kotlinx.serialization.Serializable
 import org.rncp.ad.domain.model.Ad
 
 @Entity
-@Serializable
 data class AdDao(
         @Id @GeneratedValue
         var ad_id: Int,
