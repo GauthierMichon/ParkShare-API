@@ -5,25 +5,27 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.Table
 import kotlinx.serialization.Serializable
 import org.rncp.ad.domain.model.Ad
 
 @Entity
+@Table(name = "ad")
 data class AdDao(
         @Id @GeneratedValue
-        var ad_id: Int,
-        var user_id: Int?,
-        var name: String?,
-        var description: String?,
-        var hour_price: Float?,
-        var latitude: String?,
-        var longitude: String?,
-        var state: Boolean?
+        var id: Int? = null,
+        var userId: String,
+        var name: String,
+        var description: String,
+        var hourPrice: Float,
+        var latitude: String,
+        var longitude: String,
+        var state: Boolean
 ) : PanacheEntityBase() {
-    constructor() : this(0, 0, "", "", 0.0f, "", "", false)
+    constructor() : this(0, "", "", "", 0.0f, "", "", false)
 
     fun toAd(): Ad {
-        return Ad(ad_id, user_id, name, description, hour_price, latitude, longitude, state)
+        return Ad(null, userId, name, description, hourPrice, latitude, longitude, state)
     }
 }
 

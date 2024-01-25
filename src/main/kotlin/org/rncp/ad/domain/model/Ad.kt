@@ -1,17 +1,14 @@
 package org.rncp.ad.domain.model
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class Ad(
-        var ad_id: Int,
-        var user_id: Int?,
-        var name: String?,
-        var description: String?,
-        var hour_price: Float?,
-        var latitude: String?,
-        var longitude: String?,
-        var state: Boolean?
+        var id: Int? = null,
+        var userId: String,
+        var name: String,
+        var description: String,
+        var hourPrice: Float,
+        var latitude: String,
+        var longitude: String,
+        var state: Boolean
 ) {
-    constructor() : this(0, 0, "", "", 0.0f, "", "", false)
+    constructor() : this(null,"", "", "", 0.0f, "", "", false)
 }

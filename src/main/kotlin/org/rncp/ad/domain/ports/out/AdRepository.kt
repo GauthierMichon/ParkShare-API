@@ -9,7 +9,9 @@ interface AdRepository {
     fun createAd(ad: Ad)
     fun getAllAds(): List<Ad>
     fun getAdById(id: Int): Ad
-    fun patchAd(adId: Int, updatedAd: Ad): Response
+    fun updateAd(adId: Int, updatedAd: Ad)
     fun deleteAd(adId: Int)
     fun findActiveReservationsForAd(adId: Int): List<Reservation>
+    fun publish(adId: Int)
+    fun unpublish(adId: Int)
 }

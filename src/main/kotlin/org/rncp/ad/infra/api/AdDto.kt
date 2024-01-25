@@ -1,19 +1,33 @@
 package org.rncp.ad.infra.api
 
-import org.rncp.ad.domain.model.Ad
-import com.fasterxml.jackson.annotation.JsonInclude
 import kotlinx.serialization.Serializable
+import org.rncp.ad.domain.model.Ad
+
 @Serializable
-@JsonInclude(JsonInclude.Include.NON_NULL)
 data class AdDto(
-        //val ad: Ad,
-        val ad_id: Int,
-        val user_id: Int?,
-        val name: String?,
-        val description: String?,
-        val hour_price: Float?,
-        val latitude: String?,
-        val longitude: String?,
+        val id: Int? = null,
+        val userId: String,
+        val name: String,
+        val description: String,
+        val hourPrice: Float,
+        val latitude: String,
+        val longitude: String,
         val state: Boolean,
         val link: String
-)
+) {
+    companion object {
+        fun fromAd(ad: Ad): AdDto {
+            return AdDto(
+                    id = ad.id,
+                    userId = ad.userId,
+                    name = ad.name,
+                    description = ad.description,
+                    hourPrice = ad.hourPrice,
+                    latitude = ad.latitude,
+                    longitude = ad.longitude,
+                    state = ad.state,
+                    link = "",
+            )
+        }
+    }
+}

@@ -2,16 +2,14 @@ package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
-import jakarta.transaction.Transactional
 import org.rncp.Entity.Reservation
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
-import jakarta.ws.rs.core.Response
 
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     override fun createAd(ad: Ad) {
-        val adDao = AdDao(ad.ad_id, ad.user_id, ad.name, ad.description, ad.hour_price, ad.latitude, ad.longitude, ad.state)
+        val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
         persist(adDao)
     }
 
@@ -22,21 +20,22 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     override fun getAdById(id: Int): Ad {
         return findById(id).toAd()
     }
-    @Transactional
-    override fun patchAd(adId: Int, updatedAd: Ad): Response {
+
+    override fun updateAd(adId: Int, updatedAd: Ad) {
         val existingAd = findById(adId)
 
         existingAd.apply {
-            name = updatedAd.name ?: name
-            description = updatedAd.description ?: description
-            hour_price = updatedAd.hour_price ?: hour_price
-            latitude = updatedAd.latitude ?: latitude
-            longitude = updatedAd.longitude ?: longitude
-            state = updatedAd.state ?: state
+            name = updatedAd.name
+            description = updatedAd.description
+            hourPrice = updatedAd.hourPrice
+            latitude = updatedAd.latitude
+            longitude = updatedAd.longitude
+            state = updatedAd.state
         }
         persistAndFlush(existingAd)
-        return Response.ok(existingAd).build()
     }
+
+
 
     override fun deleteAd(adId: Int) {
         deleteById(adId)
@@ -48,5 +47,17 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         // Retournez la liste des réservations actives
         return emptyList()
         //return mutableListOf<Reservation>(Reservation())
+    }
+
+    override fun publish(adId: Int) {
+        val adDao = findById(adId)
+        adDao.state = true
+        persistAndFlush(adDao)
+    }
+
+    override fun unpublish(adId: Int) {
+        val adDao = findById(adId)
+        adDao.state = false
+        persistAndFlush(adDao)
     }
 }

@@ -24,15 +24,21 @@ class AdResource {
     lateinit var getOneUseCase: GetByIdUseCase
 
     @Inject
-    lateinit var patchUseCase: PatchUseCase
+    lateinit var updateUseCase: UpdateUseCase
+
+    @Inject
+    lateinit var publishUseCase: PublishUseCase
+
+    @Inject
+    lateinit var unpublishUseCase: UnpublishUseCase
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     fun getAllAds(): List<AdDto> {
         val ads = getAllUseCase.execute()
         return ads.map { ad ->
-            val link = "/api/ads/${ad.user_id}"
-            AdDto(ad.ad_id, ad.user_id, ad.name, ad.description, ad.hour_price, ad.latitude, ad.longitude, ad.state!!, link)
+            val link = "/api/ads/${ad.userId}"
+            AdDto(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state!!, link)
         }
     }
 
@@ -45,47 +51,47 @@ class AdResource {
     }
 
     @POST
-    @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
     fun createAd(adDto: AdDto): Response {
-        val ad = Ad(adDto.ad_id, adDto.user_id, adDto.name, adDto.description, adDto.hour_price, adDto.latitude, adDto.longitude, adDto.state)
+        val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
         createUseCase.execute(ad)
-        return Response.status(Response.Status.CREATED).entity(ad).build()
+        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(ad)).build()
     }
 
-    @PATCH
+    @PUT
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun patchAd(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
-        val updatedAd = Ad(updatedAdDto.ad_id, updatedAdDto.user_id, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hour_price, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
-
-        return patchUseCase.execute(adId, updatedAd)
+    @Transactional
+    fun updateAd(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
+        val updatedAd = Ad(null, updatedAdDto.userId, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hourPrice, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
+        updateUseCase.execute(adId, updatedAd)
+        return Response.ok(AdDto.fromAd(updatedAd)).build()
     }
 
-    /*@POST
+    @POST
     @Path("/{id}/publish")
     @Produces(MediaType.APPLICATION_JSON)
-    fun postPublish(@PathParam("id") adId: Int): Ad? {
-        // TODO
-        return adRepository.findById(adId)
-    }*/
+    @Transactional
+    fun postPublish(@PathParam("id") adId: Int): Response {
+        publishUseCase.execute(adId)
+        return Response.ok().build()
+    }
 
-    /*@POST
+    @POST
     @Path("/{id}/unpublish")
     @Produces(MediaType.APPLICATION_JSON)
-    fun postUnpublish(@PathParam("id") adId: Int): Ad? {
-        // TODO
-        return adRepository.findById(adId)
-    }*/
+    @Transactional
+    fun postUnpublish(@PathParam("id") adId: Int): Response {
+        unpublishUseCase.execute(adId)
+        return Response.ok().build()
+    }
 
     @DELETE
-    @Transactional
     @Path("/{id}")
     fun deleteAd(@PathParam("id") adId: Int): Response {
-        // TODO
         deleteUseCase.deleteAd(adId)
-        // adRepository.deleteById(adId)
         return Response.noContent().build()
     }
 }
