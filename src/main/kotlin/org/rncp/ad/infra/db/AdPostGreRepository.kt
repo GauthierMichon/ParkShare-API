@@ -2,9 +2,9 @@ package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
-import org.rncp.Entity.Reservation
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
+import org.rncp.reservation.domain.model.Reservation
 
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {

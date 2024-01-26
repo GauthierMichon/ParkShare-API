@@ -1,5 +1,7 @@
 package org.rncp.ad.domain.model
 
+import org.rncp.reservation.domain.model.Reservation
+
 data class Ad(
         var id: Int? = null,
         var userId: String,
@@ -8,7 +10,7 @@ data class Ad(
         var hourPrice: Float,
         var latitude: String,
         var longitude: String,
-        var state: Boolean
+        var state: Boolean,
 ) {
     constructor() : this(null,"", "", "", 0.0f, "", "", false)
 }

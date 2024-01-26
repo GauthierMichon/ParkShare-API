@@ -1,13 +1,14 @@
 package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import jakarta.enterprise.context.ApplicationScoped
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
-import kotlinx.serialization.Serializable
 import org.rncp.ad.domain.model.Ad
+import org.rncp.reservation.infra.db.ReservationDAO
 
 @Entity
 @Table(name = "ad")
@@ -20,7 +21,7 @@ data class AdDao(
         var hourPrice: Float,
         var latitude: String,
         var longitude: String,
-        var state: Boolean
+        var state: Boolean,
 ) : PanacheEntityBase() {
     constructor() : this(0, "", "", "", 0.0f, "", "", false)
 

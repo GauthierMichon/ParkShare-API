@@ -26,7 +26,7 @@ data class AdDto(
                     latitude = ad.latitude,
                     longitude = ad.longitude,
                     state = ad.state,
-                    link = "",
+                    link = ""
             )
         }
     }

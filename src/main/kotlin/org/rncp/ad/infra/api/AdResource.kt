@@ -1,5 +1,6 @@
 package org.rncp.ad.infra.api
 
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
@@ -7,6 +8,8 @@ import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.`in`.*
+import org.rncp.reservation.domain.model.Reservation
+import org.rncp.reservation.infra.api.ReservationDTO
 
 @Path("/api/ads")
 class AdResource {
@@ -34,11 +37,11 @@ class AdResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAllAds(): List<AdDto> {
+    fun getAll(): List<AdDto> {
         val ads = getAllUseCase.execute()
         return ads.map { ad ->
             val link = "/api/ads/${ad.userId}"
-            AdDto(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state!!, link)
+            AdDto(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state, link)
         }
     }
 
@@ -46,7 +49,6 @@ class AdResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     fun getAdById(@PathParam("id") adId: Int): Ad? {
-        // TODO : Gérer si l'id n'existe pas
         return getOneUseCase.execute(adId)
     }
 
@@ -54,7 +56,7 @@ class AdResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun createAd(adDto: AdDto): Response {
+    fun create(adDto: AdDto): Response {
         val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
         createUseCase.execute(ad)
         return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(ad)).build()
@@ -64,7 +66,7 @@ class AdResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun updateAd(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
+    fun update(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
         val updatedAd = Ad(null, updatedAdDto.userId, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hourPrice, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
         updateUseCase.execute(adId, updatedAd)
         return Response.ok(AdDto.fromAd(updatedAd)).build()
@@ -74,7 +76,7 @@ class AdResource {
     @Path("/{id}/publish")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun postPublish(@PathParam("id") adId: Int): Response {
+    fun publish(@PathParam("id") adId: Int): Response {
         publishUseCase.execute(adId)
         return Response.ok().build()
     }
@@ -83,14 +85,14 @@ class AdResource {
     @Path("/{id}/unpublish")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun postUnpublish(@PathParam("id") adId: Int): Response {
+    fun unpublish(@PathParam("id") adId: Int): Response {
         unpublishUseCase.execute(adId)
         return Response.ok().build()
     }
 
     @DELETE
     @Path("/{id}")
-    fun deleteAd(@PathParam("id") adId: Int): Response {
+    fun delete(@PathParam("id") adId: Int): Response {
         deleteUseCase.deleteAd(adId)
         return Response.noContent().build()
     }

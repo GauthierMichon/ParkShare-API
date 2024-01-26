@@ -1,9 +1,9 @@
 package org.rncp.ad.domain.ports.out
 
 import jakarta.ws.rs.core.Response
-import org.rncp.Entity.Reservation
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.infra.db.AdDao
+import org.rncp.reservation.domain.model.Reservation
 
 interface AdRepository {
     fun createAd(ad: Ad)
