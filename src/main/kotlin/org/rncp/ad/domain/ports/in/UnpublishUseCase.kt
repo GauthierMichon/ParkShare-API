@@ -8,7 +8,7 @@ import org.rncp.ad.domain.ports.out.AdRepository
 @ApplicationScoped
 class UnpublishUseCase {
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
     fun execute(adId: Int) {
         adRepository.unpublish(adId)

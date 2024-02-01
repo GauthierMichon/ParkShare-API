@@ -12,6 +12,6 @@ class GetByIdUseCase {
     private lateinit var adRepository: AdRepository
 
     fun execute(id: Int): Ad {
-        return adRepository.getAdById(id)
+        return adRepository.getById(id)
     }
 }

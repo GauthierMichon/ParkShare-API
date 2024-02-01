@@ -10,9 +10,9 @@ import org.rncp.ad.domain.ports.out.AdRepository
 class UpdateUseCase {
 
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
-    fun execute(adId: Int, updatedAd: Ad /*Changer pour un Ad nullable*/) {
-        adRepository.updateAd(adId, updatedAd)
+    fun execute(adId: Int, adData: Ad): Ad {
+        return adRepository.update(adId, adData)
     }
 }

@@ -19,36 +19,38 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     @Inject
     lateinit var reservationRepository: ReservationRepository
 
-    override fun createAd(ad: Ad) {
+    override fun create(ad: Ad): Ad {
         val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
         persist(adDao)
+        return adDao.toAd()
     }
 
-    override fun getAllAds(): List<Ad> {
+    override fun getAll(): List<Ad> {
         return listAll().map { it.toAd() }
     }
 
-    override fun getAdById(id: Int): Ad {
+    override fun getById(id: Int): Ad {
         return findById(id).toAd()
     }
 
-    override fun updateAd(adId: Int, updatedAd: Ad) {
-        val existingAd = findById(adId)
+    override fun update(adId: Int, adData: Ad): Ad {
+        val adDao = findById(adId)
 
-        existingAd.apply {
-            name = updatedAd.name
-            description = updatedAd.description
-            hourPrice = updatedAd.hourPrice
-            latitude = updatedAd.latitude
-            longitude = updatedAd.longitude
-            state = updatedAd.state
+        adDao.apply {
+            name = adData.name
+            description = adData.description
+            hourPrice = adData.hourPrice
+            latitude = adData.latitude
+            longitude = adData.longitude
+            state = adData.state
         }
-        persistAndFlush(existingAd)
+        persistAndFlush(adDao)
+        return adDao.toAd()
     }
 
 
 
-    override fun deleteAd(adId: Int) {
+    override fun delete(adId: Int) {
         var feedbacks = feedbackRepository.getListByAd(adId)
         feedbacks.map { feedback ->
             feedbackRepository.deleteById(feedback.id)

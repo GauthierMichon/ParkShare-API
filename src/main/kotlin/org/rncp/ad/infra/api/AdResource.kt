@@ -50,9 +50,9 @@ class AdResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAdById(@PathParam("id") adId: Int): AdDto? {
+    fun getById(@PathParam("id") adId: Int): Response {
         val ad = getOneUseCase.execute(adId)
-        return AdDto.fromAd(ad, "")
+        return Response.ok(AdDto.fromAd(ad, "")).build()
     }
 
     @POST
@@ -61,17 +61,17 @@ class AdResource {
     @Transactional
     fun create(adDto: AdDto): Response {
         val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
-        createUseCase.execute(ad)
-        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(ad, "")).build()
+        val createdAd = createUseCase.execute(ad)
+        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(createdAd, "")).build()
     }
 
     @PUT
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun update(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
-        val updatedAd = Ad(null, updatedAdDto.userId, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hourPrice, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
-        updateUseCase.execute(adId, updatedAd)
+    fun update(@PathParam("id") adId: Int, adDto: AdDto): Response {
+        val adData = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
+        val updatedAd = updateUseCase.execute(adId, adData)
         return Response.ok(AdDto.fromAd(updatedAd, "")).build()
     }
 

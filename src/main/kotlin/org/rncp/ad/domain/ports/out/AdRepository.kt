@@ -7,11 +7,11 @@ import org.rncp.ad.infra.db.AdDao
 import org.rncp.reservation.domain.model.Reservation
 
 interface AdRepository {
-    fun createAd(ad: Ad)
-    fun getAllAds(): List<Ad>
-    fun getAdById(id: Int): Ad
-    fun updateAd(adId: Int, updatedAd: Ad)
-    fun deleteAd(adId: Int)
+    fun create(ad: Ad): Ad
+    fun getAll(): List<Ad>
+    fun getById(id: Int): Ad
+    fun update(adId: Int, adData: Ad): Ad
+    fun delete(adId: Int)
     fun findActiveReservationsForAd(adId: Int): List<Reservation>
     fun publish(adId: Int)
     fun unpublish(adId: Int)

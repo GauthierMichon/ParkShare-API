@@ -31,6 +31,14 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         return list("status.id", statusId).map { it.toReservation() }
     }
 
+    override fun cancel(reservationId: Int): Reservation {
+        val reservation = findById(reservationId)
+        val status = statusRepository.findById(3)
+        reservation.status = status
+        persistAndFlush(reservation)
+        return reservation.toReservation()
+    }
+
     override fun delete(id: Int) {
         deleteById(id)
     }

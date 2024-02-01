@@ -9,9 +9,9 @@ import org.rncp.ad.domain.ports.out.AdRepository
 class CreateUseCase {
 
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
-    fun execute(ad: Ad) {
-        adRepository.createAd(ad)
+    fun execute(ad: Ad): Ad {
+        return adRepository.create(ad)
     }
 }
