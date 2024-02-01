@@ -35,6 +35,7 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         val reservation = findById(reservationId)
         val status = statusRepository.findById(3)
         reservation.status = status
+        persistAndFlush(reservation)
         return reservation.toReservation()
     }
 

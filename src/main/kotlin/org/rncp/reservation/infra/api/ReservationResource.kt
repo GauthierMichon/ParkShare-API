@@ -54,7 +54,7 @@ class ReservationResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/ad/{statusId}")
+    @Path("/status/{statusId}")
     fun getListByStatus(@PathParam("statusId") statusId: Int): List<ReservationDTO> {
         val reservations = getListByStatusUseCase.execute(statusId)
         return reservations.map { ReservationDTO.fromReservation(it) }
@@ -74,7 +74,8 @@ class ReservationResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{id}")
+    @Transactional
+    @Path("/cancel/{id}")
     fun cancel(@PathParam("id") reservationId: Int): Response {
         val reservation = cancelUseCase.execute(reservationId)
         return Response.ok(ReservationDTO.fromReservation(reservation)).build()
