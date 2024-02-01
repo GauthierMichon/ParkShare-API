@@ -41,15 +41,16 @@ class AdResource {
         val ads = getAllUseCase.execute()
         return ads.map { ad ->
             val link = "/api/ads/${ad.userId}"
-            AdDto(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state, link)
+            AdDto.fromAd(ad, link)
         }
     }
 
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAdById(@PathParam("id") adId: Int): Ad? {
-        return getOneUseCase.execute(adId)
+    fun getAdById(@PathParam("id") adId: Int): AdDto? {
+        val ad = getOneUseCase.execute(adId)
+        return AdDto.fromAd(ad, "")
     }
 
     @POST
@@ -59,7 +60,7 @@ class AdResource {
     fun create(adDto: AdDto): Response {
         val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
         createUseCase.execute(ad)
-        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(ad)).build()
+        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(ad, "")).build()
     }
 
     @PUT
@@ -69,7 +70,7 @@ class AdResource {
     fun update(@PathParam("id") adId: Int, updatedAdDto: AdDto): Response {
         val updatedAd = Ad(null, updatedAdDto.userId, updatedAdDto.name, updatedAdDto.description, updatedAdDto.hourPrice, updatedAdDto.latitude, updatedAdDto.longitude, updatedAdDto.state)
         updateUseCase.execute(adId, updatedAd)
-        return Response.ok(AdDto.fromAd(updatedAd)).build()
+        return Response.ok(AdDto.fromAd(updatedAd, "")).build()
     }
 
     @POST
@@ -91,9 +92,10 @@ class AdResource {
     }
 
     @DELETE
+    @Transactional
     @Path("/{id}")
     fun delete(@PathParam("id") adId: Int): Response {
-        deleteUseCase.deleteAd(adId)
+        deleteUseCase.execute(adId)
         return Response.noContent().build()
     }
 }

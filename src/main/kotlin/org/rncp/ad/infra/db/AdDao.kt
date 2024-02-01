@@ -26,7 +26,7 @@ data class AdDao(
     constructor() : this(0, "", "", "", 0.0f, "", "", false)
 
     fun toAd(): Ad {
-        return Ad(null, userId, name, description, hourPrice, latitude, longitude, state)
+        return Ad(id, userId, name, description, hourPrice, latitude, longitude, state)
     }
 }
 

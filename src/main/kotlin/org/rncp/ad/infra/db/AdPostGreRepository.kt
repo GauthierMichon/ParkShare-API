@@ -2,12 +2,22 @@ package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
+import jakarta.inject.Inject
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
+import org.rncp.feedback.infra.db.FeedbackPostGreRepository
 import org.rncp.reservation.domain.model.Reservation
+import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
 
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
+
+    @Inject
+    lateinit var reservationGetListByAdUseCase: GetListByAdUseCase
+
+    @Inject
+    lateinit var feedbackRepository: FeedbackPostGreRepository
+
     override fun createAd(ad: Ad) {
         val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
         persist(adDao)
@@ -38,14 +48,19 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
 
 
     override fun deleteAd(adId: Int) {
+        var feedbacks = feedbackRepository.getListByAd(adId)
+        feedbacks.map { feedback ->
+            feedbackRepository.deleteById(feedback.id)
+        }
         deleteById(adId)
     }
 
     override fun findActiveReservationsForAd(adId: Int): List<Reservation> {
-        // Implémentez la logique pour récupérer les réservations actives pour une annonce
+        // TODO : Implémentez la logique pour récupérer les réservations actives pour une annonce
         // Vous pouvez utiliser des requêtes JPA ou d'autres méthodes selon votre base de données
         // Retournez la liste des réservations actives
         return emptyList()
+        //return reservationGetListByAdUseCase.execute(adId)
         //return mutableListOf<Reservation>(Reservation())
     }
 

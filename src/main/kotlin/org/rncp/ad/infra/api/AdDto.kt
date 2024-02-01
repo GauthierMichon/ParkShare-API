@@ -16,7 +16,7 @@ data class AdDto(
         val link: String
 ) {
     companion object {
-        fun fromAd(ad: Ad): AdDto {
+        fun fromAd(ad: Ad, link: String): AdDto {
             return AdDto(
                     id = ad.id,
                     userId = ad.userId,
@@ -26,7 +26,7 @@ data class AdDto(
                     latitude = ad.latitude,
                     longitude = ad.longitude,
                     state = ad.state,
-                    link = ""
+                    link = link
             )
         }
     }

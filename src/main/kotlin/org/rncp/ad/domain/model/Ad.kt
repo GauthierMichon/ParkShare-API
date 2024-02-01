@@ -1,7 +1,5 @@
 package org.rncp.ad.domain.model
 
-import org.rncp.reservation.domain.model.Reservation
-
 data class Ad(
         var id: Int? = null,
         var userId: String,
