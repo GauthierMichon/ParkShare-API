@@ -8,15 +8,16 @@ import org.rncp.ad.domain.ports.out.AdRepository
 import org.rncp.feedback.infra.db.FeedbackPostGreRepository
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
+import org.rncp.reservation.domain.ports.out.ReservationRepository
 
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
 
     @Inject
-    lateinit var reservationGetListByAdUseCase: GetListByAdUseCase
+    lateinit var feedbackRepository: FeedbackPostGreRepository
 
     @Inject
-    lateinit var feedbackRepository: FeedbackPostGreRepository
+    lateinit var reservationRepository: ReservationRepository
 
     override fun createAd(ad: Ad) {
         val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
@@ -51,6 +52,10 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         var feedbacks = feedbackRepository.getListByAd(adId)
         feedbacks.map { feedback ->
             feedbackRepository.deleteById(feedback.id)
+        }
+        var reservations = reservationRepository.getListByAd(adId)
+        reservations.map { reservation ->
+            reservationRepository.delete(reservation.id!!)
         }
         deleteById(adId)
     }

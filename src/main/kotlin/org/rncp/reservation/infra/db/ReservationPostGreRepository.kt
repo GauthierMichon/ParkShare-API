@@ -32,7 +32,7 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     }
 
     override fun delete(id: Int) {
-
+        deleteById(id)
     }
     override fun update(reservationId: Int, reservation: Reservation) {
         val reservationToUpdate = findById(reservationId)

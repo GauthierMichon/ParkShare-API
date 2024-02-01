@@ -6,11 +6,8 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
-import org.rncp.reservation.domain.ports.`in`.GetListByStatusUseCase
 import org.rncp.reservation.domain.model.Reservation
-import org.rncp.reservation.domain.ports.`in`.CreateUseCase
-import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
-import org.rncp.reservation.domain.ports.`in`.UpdateUseCase
+import org.rncp.reservation.domain.ports.`in`.*
 
 
 @Path("/api/reservation")
@@ -26,6 +23,9 @@ class ReservationResource {
 
     @Inject
     lateinit var getListByStatusUseCase: GetListByStatusUseCase
+
+    @Inject
+    lateinit var deleteUseCase: DeleteUseCase
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -66,6 +66,14 @@ class ReservationResource {
         val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
         updateUseCase.execute(reservationId, reservation)
         return Response.ok(ReservationDTO.fromReservation(reservation)).build()
+    }
+
+    @DELETE
+    @Transactional
+    @Path("/{id}")
+    fun delete(@PathParam("id") reservationId: Int): Response {
+        deleteUseCase.execute(reservationId)
+        return Response.noContent().build()
     }
 
 }
