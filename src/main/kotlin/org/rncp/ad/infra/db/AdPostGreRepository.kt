@@ -50,7 +50,7 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
 
 
 
-    override fun deleteAd(adId: Int) {
+    override fun delete(adId: Int) {
         var feedbacks = feedbackRepository.getListByAd(adId)
         feedbacks.map { feedback ->
             feedbackRepository.deleteById(feedback.id)

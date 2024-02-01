@@ -15,7 +15,7 @@ class DeleteUseCase {
         val activeReservations = adRepository.findActiveReservationsForAd(adId)
 
         if (activeReservations.isEmpty()) {
-            adRepository.deleteAd(adId)
+            adRepository.delete(adId)
         } else {
         }
     }

@@ -50,9 +50,9 @@ class AdResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAdById(@PathParam("id") adId: Int): Response {
+    fun getById(@PathParam("id") adId: Int): Response {
         val ad = getOneUseCase.execute(adId)
-        return Response.ok(AdDto.fromAd(ad)).build()
+        return Response.ok(AdDto.fromAd(ad, "")).build()
     }
 
     @POST
@@ -62,7 +62,7 @@ class AdResource {
     fun create(adDto: AdDto): Response {
         val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
         val createdAd = createUseCase.execute(ad)
-        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(createdAd)).build()
+        return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(createdAd, "")).build()
     }
 
     @PUT
@@ -72,7 +72,7 @@ class AdResource {
     fun update(@PathParam("id") adId: Int, adDto: AdDto): Response {
         val adData = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
         val updatedAd = updateUseCase.execute(adId, adData)
-        return Response.ok(AdDto.fromAd(updatedAd)).build()
+        return Response.ok(AdDto.fromAd(updatedAd, "")).build()
     }
 
     @POST
