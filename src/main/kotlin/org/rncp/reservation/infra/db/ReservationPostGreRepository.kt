@@ -6,21 +6,31 @@ import jakarta.inject.Inject
 import org.rncp.ad.infra.db.AdPostGreRepository
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.out.ReservationRepository
+import org.rncp.status.infra.db.StatusPostGreRepository
 
 @ApplicationScoped
 class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> , ReservationRepository {
 
     @Inject
-    lateinit var adRepository: AdPostGreRepository
+    private lateinit var adRepository: AdPostGreRepository
+
+    @Inject
+    private lateinit var statusRepository: StatusPostGreRepository
 
     override fun create(reservation: Reservation) {
         val ad = adRepository.findById(reservation.adId)
-        val reservationDAO = ReservationDAO(null, ad, reservation.userId, reservation.beginDate, reservation.endDate, reservation.statusId)
+        val status = statusRepository.findById(reservation.statusId)
+        val reservationDAO = ReservationDAO(null, ad, reservation.userId, reservation.beginDate, reservation.endDate, status)
         persistAndFlush(reservationDAO)
     }
     override fun getListByAd(adId: Int): List<Reservation> {
         return list("ad.id", adId).map { it.toReservation() }
     }
+
+    override fun getListByStatus(statusId: Int): List<Reservation> {
+        return list("status.id", statusId).map { it.toReservation() }
+    }
+
     override fun delete(id: Int) {
 
     }
@@ -31,7 +41,7 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
             userId = reservation.userId
             beginDate = reservation.beginDate
             endDate = reservation.endDate
-            statusId = reservation.statusId
+            status = statusRepository.findById(reservation.statusId)
         }
         persistAndFlush(reservationToUpdate)
     }

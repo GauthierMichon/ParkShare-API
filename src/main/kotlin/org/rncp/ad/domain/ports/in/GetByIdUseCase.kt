@@ -9,7 +9,7 @@ import org.rncp.ad.domain.ports.out.AdRepository
 class GetByIdUseCase {
 
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
     fun execute(id: Int): Ad {
         return adRepository.getAdById(id)

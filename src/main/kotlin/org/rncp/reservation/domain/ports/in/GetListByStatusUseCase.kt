@@ -6,12 +6,11 @@ import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.out.ReservationRepository
 
 @ApplicationScoped
-class CreateUseCase {
-
+class GetListByStatusUseCase {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
-    fun execute(reservation: Reservation) {
-        reservationRepository.create(reservation)
+    fun execute(statusId: Int): List<Reservation> {
+        return reservationRepository.getListByStatus(statusId)
     }
 }

@@ -8,7 +8,7 @@ import org.rncp.feedback.domain.model.Feedback
 @Entity
 @Table(name="feedback")
 data class FeedbackDAO(
-        @Id @GeneratedValue
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int? = null,
         @ManyToOne(targetEntity = AdDao::class, fetch = FetchType.LAZY)
         @JoinColumn(name="ad")
