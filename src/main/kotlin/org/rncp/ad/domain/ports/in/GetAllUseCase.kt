@@ -11,9 +11,9 @@ import org.rncp.ad.infra.api.AdDto
 class GetAllUseCase {
 
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
     fun execute(): List<Ad> {
-        return adRepository.getAllAds()
+        return adRepository.getAll()
     }
 }

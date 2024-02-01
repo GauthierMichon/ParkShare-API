@@ -27,6 +27,9 @@ class ReservationResource {
     @Inject
     lateinit var deleteUseCase: DeleteUseCase
 
+    @Inject
+    lateinit var cancelUseCase: CancelUseCase
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -65,6 +68,15 @@ class ReservationResource {
     fun update(@PathParam("id") reservationId: Int, reservationDTO: ReservationDTO): Response {
         val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
         updateUseCase.execute(reservationId, reservation)
+        return Response.ok(ReservationDTO.fromReservation(reservation)).build()
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/{id}")
+    fun cancel(@PathParam("id") reservationId: Int): Response {
+        val reservation = cancelUseCase.execute(reservationId)
         return Response.ok(ReservationDTO.fromReservation(reservation)).build()
     }
 

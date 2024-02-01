@@ -9,7 +9,7 @@ import org.rncp.ad.domain.ports.out.AdRepository
 class DeleteUseCase {
 
     @Inject
-    lateinit var adRepository: AdRepository
+    private lateinit var adRepository: AdRepository
 
     fun execute(adId: Int) {
         val activeReservations = adRepository.findActiveReservationsForAd(adId)
