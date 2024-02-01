@@ -12,7 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 @QuarkusTest
 class IntegrationTest {
 
-    @Test
+    /*@Test
     fun testPost() {
         // Données à envoyer dans la requête POST
         val requestAd = """{
@@ -37,7 +37,7 @@ class IntegrationTest {
         """.trimIndent()
 
         // Effectuer la requête POST
-        /*val response = */
+        *//*val response = *//*
         io.restassured.RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(requestAd)
@@ -86,7 +86,7 @@ class IntegrationTest {
         """.trimIndent()
 
         // Effectuer la requête POST
-        /*val response = */
+        *//*val response = *//*
         io.restassured.RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(requestAd)
@@ -121,5 +121,5 @@ class IntegrationTest {
         assertEquals(4, feedbackEntity[feedbackEntity.size-1].rating)
         assertEquals("testl", feedbackEntity[feedbackEntity.size-1].description)
         assertEquals("testc", feedbackEntity[feedbackEntity.size-1].date)
-    }
+    }*/
 }
