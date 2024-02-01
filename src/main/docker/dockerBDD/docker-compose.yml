@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: ParkShareDatabase
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
+      POSTGRES_ENCODING: UTF-8
     networks:
       - my_network
 

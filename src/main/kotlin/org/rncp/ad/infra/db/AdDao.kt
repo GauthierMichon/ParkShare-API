@@ -1,19 +1,14 @@
 package org.rncp.ad.infra.db
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.rncp.ad.domain.model.Ad
 import org.rncp.reservation.infra.db.ReservationDAO
 
 @Entity
 @Table(name = "ad")
 data class AdDao(
-        @Id @GeneratedValue
+        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int? = null,
         var userId: String,
         var name: String,

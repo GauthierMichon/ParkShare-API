@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import org.eclipse.microprofile.openapi.annotations.Operation
+import org.rncp.reservation.domain.ports.`in`.GetListByStatusUseCase
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.`in`.CreateUseCase
 import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
@@ -22,10 +24,17 @@ class ReservationResource {
     @Inject
     lateinit var updateUseCase: UpdateUseCase
 
+    @Inject
+    lateinit var getListByStatusUseCase: GetListByStatusUseCase
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Operation(
+            summary = "Get a friendly greeting",
+            description = "Returns a plain text greeting"
+    )
     fun create(reservationDTO: ReservationDTO): Response {
         val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
         createUseCase.execute(reservation)
@@ -37,6 +46,14 @@ class ReservationResource {
     @Path("/ad/{adId}")
     fun getListByAd(@PathParam("adId") adId: Int): List<ReservationDTO> {
         val reservations = getListByAdUseCase.execute(adId)
+        return reservations.map { ReservationDTO.fromReservation(it) }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/ad/{statusId}")
+    fun getListByStatus(@PathParam("statusId") statusId: Int): List<ReservationDTO> {
+        val reservations = getListByStatusUseCase.execute(statusId)
         return reservations.map { ReservationDTO.fromReservation(it) }
     }
 
