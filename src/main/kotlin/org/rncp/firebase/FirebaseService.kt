@@ -15,22 +15,22 @@ class FirebaseService {
     private lateinit var userRepository: UserRepository
 
     class FirebaseAuthException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
-    fun authenticateWithFirebase(idToken: String): User? {
-        try {
-            val decodedToken: FirebaseToken = FirebaseAuth.getInstance().verifyIdToken(idToken)
-            val uid: String = decodedToken.uid
-            val email: String? = decodedToken.email
+    fun authenticate(email: String, password: String): String? {
+//        try {
+//            val authResult = FirebaseAuth.getInstance()
+//
+//            val existingUser = userRepository.getByIdUid(uid)
+//
+//            if (existingUser != null) {
+//                return existingUser
+//            } else {
+//                throw FirebaseAuthException("L'utilisateur avec cet UID n'existe pas.")
+//            }
+//        } catch (e: FirebaseAuthException) {
+//            throw FirebaseAuthException("Erreur d'authentification : ${e.message}", e)
+//        }
 
-            val existingUser = userRepository.getByIdUid(uid)
-
-            if (existingUser != null) {
-                return existingUser
-            } else {
-                throw FirebaseAuthException("L'utilisateur avec cet UID n'existe pas.")
-            }
-        } catch (e: FirebaseAuthException) {
-            throw FirebaseAuthException("Erreur d'authentification : ${e.message}", e)
-        }
+        return ""
     }
 
 

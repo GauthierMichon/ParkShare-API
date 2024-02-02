@@ -12,7 +12,7 @@ class UserPostGreRepository: PanacheRepositoryBase<UserDAO, Int>, UserRepository
     }
 
     override fun create(user: User): User {
-        val userDAO = UserDAO(null, user.uid!!, user.firstname, user.lastname, user.email, user.roleId)
+        val userDAO = UserDAO(user.uid!!, user.firstname, user.lastname, user.email, user.roleId)
         persist(userDAO)
         return userDAO.toUser()
     }

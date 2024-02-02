@@ -5,7 +5,6 @@ import org.rncp.user.domain.model.User
 
 @Serializable
 data class UserDTO(
-        val id: Int? = null,
         val uid: String? = null,
         val password: String? = null,
         val firstname: String,
@@ -16,7 +15,6 @@ data class UserDTO(
     companion object {
         fun fromUser(user: User): UserDTO {
             return UserDTO(
-                    id = user.id,
                     uid = user.uid,
                     null,
                     firstname = user.firstname,

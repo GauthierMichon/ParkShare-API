@@ -7,17 +7,16 @@ import org.rncp.user.domain.model.User
 @Entity
 @Table(name="\"user\"")
 data class UserDAO(
-        @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Int? = null,
+        @Id
         val uid: String,
         val firstname: String,
         val lastname: String,
         val email: String,
         val roleId: Int,
 ): PanacheEntityBase() {
-    constructor(): this(null, "", "", "", "", 0)
+    constructor(): this("", "", "", "", 0)
 
     fun toUser(): User {
-        return User(id, uid, firstname, lastname, email, roleId)
+        return User(uid, firstname, lastname, email, roleId)
     }
 }
