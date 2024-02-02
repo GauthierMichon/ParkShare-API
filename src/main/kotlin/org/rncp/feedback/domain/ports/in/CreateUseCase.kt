@@ -13,7 +13,7 @@ class CreateUseCase {
     @Inject
     lateinit var feedbackRepository: FeedbackRepository
 
-    fun execute(feedback: Feedback) {
-        feedbackRepository.create(feedback)
+    fun execute(feedback: Feedback): Feedback {
+        return feedbackRepository.create(feedback)
     }
 }

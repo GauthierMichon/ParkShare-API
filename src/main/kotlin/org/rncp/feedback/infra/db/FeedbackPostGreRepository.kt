@@ -15,10 +15,11 @@ class FeedbackPostGreRepository : PanacheRepositoryBase<FeedbackDAO, Int> , Feed
     @Inject
     lateinit var adRepository: AdPostGreRepository
 
-    override fun create(feedback: Feedback) {
+    override fun create(feedback: Feedback): Feedback {
         val ad = adRepository.findById(feedback.adId)
         val feedbackDAO = FeedbackDAO(null, ad, feedback.userId, feedback.rating, feedback.description, feedback.date)
         persistAndFlush(feedbackDAO)
+        return feedbackDAO.toFeedback()
     }
     override fun getListByAd(feedbackId: Int): List<Feedback> {
         return list("ad.id", feedbackId).map { it.toFeedback() }

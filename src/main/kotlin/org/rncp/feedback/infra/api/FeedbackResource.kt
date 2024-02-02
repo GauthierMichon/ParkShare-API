@@ -32,8 +32,8 @@ class FeedbackResource {
     @Transactional
     fun create(feedbackDTO: FeedbackDTO): Response {
         val feedback = Feedback(null, feedbackDTO.adId, feedbackDTO.userId, feedbackDTO.rating, feedbackDTO.description, feedbackDTO.date)
-        createUseCase.execute(feedback)
-        return Response.status(Response.Status.CREATED).entity(FeedbackDTO.fromFeedback(feedback)).build()
+        val createdFeedback = createUseCase.execute(feedback)
+        return Response.status(Response.Status.CREATED).entity(FeedbackDTO.fromFeedback(createdFeedback)).build()
     }
 
     @GET
