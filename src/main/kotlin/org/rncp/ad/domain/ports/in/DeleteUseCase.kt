@@ -17,6 +17,7 @@ class DeleteUseCase {
         if (activeReservations.isEmpty()) {
             adRepository.delete(adId)
         } else {
+
         }
     }
 }

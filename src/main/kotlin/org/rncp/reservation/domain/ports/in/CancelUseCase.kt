@@ -10,7 +10,7 @@ class CancelUseCase {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
-    fun execute(reservationId: Int): Reservation {
+    fun execute(reservationId: Int): Reservation? {
         return reservationRepository.cancel(reservationId)
     }
 }

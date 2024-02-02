@@ -1,17 +1,12 @@
 package org.rncp.ad.infra.api
 
-import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
-import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
-import jakarta.ws.rs.core.SecurityContext
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.`in`.*
-import org.rncp.reservation.domain.model.Reservation
-import org.rncp.reservation.infra.api.ReservationDTO
 
 @Path("/api/ads")
 class AdResource {
@@ -26,7 +21,7 @@ class AdResource {
     lateinit var getAllUseCase: GetAllUseCase
 
     @Inject
-    lateinit var getOneUseCase: GetByIdUseCase
+    lateinit var getOneUseCase: GetAdByIdUseCase
 
     @Inject
     lateinit var updateUseCase: UpdateUseCase
@@ -52,7 +47,12 @@ class AdResource {
     @Produces(MediaType.APPLICATION_JSON)
     fun getById(@PathParam("id") adId: Int): Response {
         val ad = getOneUseCase.execute(adId)
-        return Response.ok(AdDto.fromAd(ad, "")).build()
+
+        return if (ad != null) {
+            Response.ok(AdDto.fromAd(ad, "")).build()
+        } else {
+            Response.status(Response.Status.NOT_FOUND).build()
+        }
     }
 
     @POST
@@ -61,6 +61,10 @@ class AdResource {
     @Transactional
     fun create(adDto: AdDto): Response {
         val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
+        if (adDto.hourPrice < 0f || adDto.latitude < -90 || adDto.latitude > 90 || adDto.longitude < -180 || adDto.longitude > 180) {
+            return Response.status(Response.Status.BAD_REQUEST).build()
+        }
+
         val createdAd = createUseCase.execute(ad)
         return Response.status(Response.Status.CREATED).entity(AdDto.fromAd(createdAd, "")).build()
     }
@@ -71,6 +75,9 @@ class AdResource {
     @Transactional
     fun update(@PathParam("id") adId: Int, adDto: AdDto): Response {
         val adData = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
+        if (adDto.hourPrice < 0f || adDto.latitude < -90 || adDto.latitude > 90 || adDto.longitude < -180 || adDto.longitude > 180) {
+            return Response.status(Response.Status.BAD_REQUEST).build()
+        }
         val updatedAd = updateUseCase.execute(adId, adData)
         return Response.ok(AdDto.fromAd(updatedAd, "")).build()
     }

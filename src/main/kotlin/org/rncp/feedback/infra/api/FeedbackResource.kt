@@ -5,6 +5,8 @@ import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import org.rncp.ad.domain.ports.`in`.GetAdByIdUseCase
+import org.rncp.ad.infra.api.AdDto
 import org.rncp.feedback.domain.model.Feedback
 import org.rncp.feedback.domain.ports.`in`.*
 import org.rncp.reservation.infra.api.ReservationDTO
@@ -27,12 +29,20 @@ class FeedbackResource {
     @Inject
     lateinit var getOneUseCase: GetByIdUseCase
 
+    @Inject
+    lateinit var getAdbyIdUseCase: GetAdByIdUseCase
+
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     fun getById(@PathParam("id") adId: Int): Response {
         val feedback = getOneUseCase.execute(adId)
-        return Response.ok(FeedbackDTO.fromFeedback(feedback)).build()
+
+        return if (feedback != null) {
+            return Response.ok(FeedbackDTO.fromFeedback(feedback)).build()
+        } else {
+            Response.status(Response.Status.NOT_FOUND).build()
+        }
     }
 
     @POST
@@ -41,6 +51,14 @@ class FeedbackResource {
     @Transactional
     fun create(feedbackDTO: FeedbackDTO): Response {
         val feedback = Feedback(null, feedbackDTO.adId, feedbackDTO.userId, feedbackDTO.rating, feedbackDTO.description, feedbackDTO.date)
+
+        feedbackDTO.rating?.let { rating ->
+            if (rating < 1 || rating > 5 || getAdbyIdUseCase.execute(feedbackDTO.adId) == null) {
+                return Response.status(Response.Status.BAD_REQUEST).build()
+            }
+        }
+
+
         val createdFeedback = createUseCase.execute(feedback)
         return Response.status(Response.Status.CREATED).entity(FeedbackDTO.fromFeedback(createdFeedback)).build()
     }
@@ -60,6 +78,12 @@ class FeedbackResource {
     @Transactional
     fun update(@PathParam("id") feedbackId: Int, feedbackDTO: FeedbackDTO): Response {
         val feedback = Feedback(null, feedbackDTO.adId, feedbackDTO.userId, feedbackDTO.rating, feedbackDTO.description, feedbackDTO.date)
+        feedbackDTO.rating?.let { rating ->
+            if (rating < 1 || rating > 5) {
+                return Response.status(Response.Status.BAD_REQUEST).build()
+            }
+        }
+
         updateUseCase.execute(feedbackId, feedback)
         return Response.ok(FeedbackDTO.fromFeedback(feedback)).build()
     }

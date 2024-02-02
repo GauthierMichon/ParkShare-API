@@ -13,7 +13,7 @@ class GetByIdUseCase {
     @Inject
     private lateinit var feedbackRepository: FeedbackRepository
 
-    fun execute(id: Int): Feedback {
+    fun execute(id: Int): Feedback? {
         return feedbackRepository.getById(id)
     }
 }

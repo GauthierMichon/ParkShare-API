@@ -10,8 +10,8 @@ data class AdDto(
         val name: String,
         val description: String,
         val hourPrice: Float,
-        val latitude: String,
-        val longitude: String,
+        val latitude: Float,
+        val longitude: Float,
         val state: Boolean,
         val link: String
 ) {

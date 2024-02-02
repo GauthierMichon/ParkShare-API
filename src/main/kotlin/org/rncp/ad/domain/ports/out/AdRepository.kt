@@ -9,7 +9,7 @@ import org.rncp.reservation.domain.model.Reservation
 interface AdRepository {
     fun create(ad: Ad): Ad
     fun getAll(): List<Ad>
-    fun getById(id: Int): Ad
+    fun getById(id: Int): Ad?
     fun update(adId: Int, adData: Ad): Ad
     fun delete(adId: Int)
     fun findActiveReservationsForAd(adId: Int): List<Reservation>

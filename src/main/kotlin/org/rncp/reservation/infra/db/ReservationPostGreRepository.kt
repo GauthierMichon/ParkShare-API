@@ -26,8 +26,9 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         persistAndFlush(reservationDAO)
         return reservationDAO.toReservation()
     }
-    override fun getById(id: Int): Reservation {
-        return findById(id).toReservation()
+    override fun getById(id: Int): Reservation? {
+        val reservationDao = findById(id) ?: return null
+        return reservationDao.toReservation()
     }
     override fun getListByAd(adId: Int): List<Reservation> {
         return list("ad.id", adId).map { it.toReservation() }
@@ -37,12 +38,12 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         return list("status.id", statusId).map { it.toReservation() }
     }
 
-    override fun cancel(reservationId: Int): Reservation {
-        val reservation = findById(reservationId)
+    override fun cancel(reservationId: Int): Reservation? {
+        val reservationDao = findById(reservationId) ?: return null
         val status = statusRepository.findById(3)
-        reservation.status = status
-        persistAndFlush(reservation)
-        return reservation.toReservation()
+        reservationDao.status = status
+        persistAndFlush(reservationDao)
+        return reservationDao.toReservation()
     }
 
     override fun delete(id: Int) {

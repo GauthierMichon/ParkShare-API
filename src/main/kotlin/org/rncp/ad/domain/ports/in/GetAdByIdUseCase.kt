@@ -6,12 +6,12 @@ import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
 
 @ApplicationScoped
-class GetByIdUseCase {
+class GetAdByIdUseCase {
 
     @Inject
     private lateinit var adRepository: AdRepository
 
-    fun execute(id: Int): Ad {
+    fun execute(id: Int): Ad? {
         return adRepository.getById(id)
     }
 }

@@ -29,8 +29,9 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return listAll().map { it.toAd() }
     }
 
-    override fun getById(id: Int): Ad {
-        return findById(id).toAd()
+    override fun getById(id: Int): Ad? {
+        val adDao = findById(id) ?: return null
+        return adDao.toAd()
     }
 
     override fun update(adId: Int, adData: Ad): Ad {

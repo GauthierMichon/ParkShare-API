@@ -14,7 +14,7 @@ class GetByIdUseCase {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
-    fun execute(id: Int): Reservation {
+    fun execute(id: Int): Reservation? {
         return reservationRepository.getById(id)
     }
 }

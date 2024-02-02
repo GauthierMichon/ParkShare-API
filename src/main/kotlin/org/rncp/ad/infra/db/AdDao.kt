@@ -14,11 +14,11 @@ data class AdDao(
         var name: String,
         var description: String,
         var hourPrice: Float,
-        var latitude: String,
-        var longitude: String,
+        var latitude: Float,
+        var longitude: Float,
         var state: Boolean,
 ) : PanacheEntityBase() {
-    constructor() : this(0, "", "", "", 0.0f, "", "", false)
+    constructor() : this(0, "", "", "", 0.0f, 0.0f, 0.0f, false)
 
     fun toAd(): Ad {
         return Ad(id, userId, name, description, hourPrice, latitude, longitude, state)

@@ -1,7 +1,10 @@
 package org.rncp.feedback.infra.api
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import org.rncp.LocalDateTimeSerializer
 import org.rncp.feedback.domain.model.Feedback
+import java.time.LocalDateTime
 
 @Serializable
 data class FeedbackDTO(
@@ -10,7 +13,8 @@ data class FeedbackDTO(
         var userId: String,
         var rating: Int?,
         var description: String,
-        var date: String,
+        @Serializable(with = LocalDateTimeSerializer::class)
+        var date: LocalDateTime,
 ) {
     companion object {
         fun fromFeedback(feedback: Feedback): FeedbackDTO {

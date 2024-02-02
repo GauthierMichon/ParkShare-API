@@ -6,9 +6,9 @@ data class Ad(
         var name: String,
         var description: String,
         var hourPrice: Float,
-        var latitude: String,
-        var longitude: String,
+        var latitude: Float,
+        var longitude: Float,
         var state: Boolean,
 ) {
-    constructor() : this(null,"", "", "", 0.0f, "", "", false)
+    constructor() : this(null,"", "", "", 0.0f, 0.0f, 0.0f, false)
 }
