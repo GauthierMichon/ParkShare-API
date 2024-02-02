@@ -6,10 +6,8 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.rncp.feedback.domain.model.Feedback
-import org.rncp.feedback.domain.ports.`in`.CreateUseCase
-import org.rncp.feedback.domain.ports.`in`.DeleteUseCase
-import org.rncp.feedback.domain.ports.`in`.GetListByAdUseCase
-import org.rncp.feedback.domain.ports.`in`.UpdateUseCase
+import org.rncp.feedback.domain.ports.`in`.*
+import org.rncp.reservation.infra.api.ReservationDTO
 
 
 @Path("/api/feedback")
@@ -25,6 +23,17 @@ class FeedbackResource {
 
     @Inject
     lateinit var deleteUseCase: DeleteUseCase
+
+    @Inject
+    lateinit var getOneUseCase: GetByIdUseCase
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getById(@PathParam("id") adId: Int): Response {
+        val feedback = getOneUseCase.execute(adId)
+        return Response.ok(FeedbackDTO.fromFeedback(feedback)).build()
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

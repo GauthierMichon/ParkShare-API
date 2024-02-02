@@ -32,7 +32,7 @@ class FeedbackTest {
                 .`as`(FeedbackDTO::class.java)
     }
 
-    private fun getFeedbackById(adId: Int?): List<FeedbackDTO> {
+    private fun getFeedbackByAdId(adId: Int?): List<FeedbackDTO> {
         return RestAssured.given().get("/api/feedback/ad/$adId")
                 .then()
                 .statusCode(200)
@@ -40,6 +40,14 @@ class FeedbackTest {
                 .body()
                 .jsonPath()
                 .getList(".", FeedbackDTO::class.java)
+    }
+
+    private fun getFeedbackById(feedbackId: Int?): FeedbackDTO {
+        return RestAssured.given().get("/api/feedback/$feedbackId")
+                .then()
+                .statusCode(200)
+                .extract()
+                .`as`(FeedbackDTO::class.java)
     }
 
     @Test
@@ -50,7 +58,7 @@ class FeedbackTest {
         val requestFeedback = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", "19/09/2023")
         val feedbackGiven = createFeedback(requestFeedback)
 
-        val feedbackEntity = getFeedbackById(feedbackGiven.adId).last
+        val feedbackEntity = getFeedbackById(feedbackGiven.id)
 
         val expectedFeedback = FeedbackDTO(feedbackGiven.id, adGiven.id!!, adGiven.userId, 4, "Super", "19/09/2023")
 
@@ -69,7 +77,7 @@ class FeedbackTest {
                 .then()
                 .statusCode(204)
 
-        val feedbacks = getFeedbackById(feedbackGiven.adId)
+        val feedbacks = getFeedbackByAdId(feedbackGiven.adId)
 
         Assertions.assertEquals(0, feedbacks.size)
     }
@@ -89,7 +97,7 @@ class FeedbackTest {
                 .then()
                 .statusCode(200)
 
-        val feedbackUpdate = getFeedbackById(feedbackGiven.id).last
+        val feedbackUpdate = getFeedbackById(feedbackGiven.id)
         val expectedFeedback = FeedbackDTO(feedbackGiven.id, adGiven.id!!, adGiven.userId, 2, "Pas ouf", "21/09/2023")
 
         Assertions.assertEquals(expectedFeedback, feedbackUpdate)

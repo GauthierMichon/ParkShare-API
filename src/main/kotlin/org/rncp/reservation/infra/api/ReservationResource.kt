@@ -6,6 +6,7 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.eclipse.microprofile.openapi.annotations.Operation
+import org.rncp.ad.infra.api.AdDto
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.`in`.*
 
@@ -30,6 +31,17 @@ class ReservationResource {
     @Inject
     lateinit var cancelUseCase: CancelUseCase
 
+    @Inject
+    lateinit var getOneUseCase: GetByIdUseCase
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun getById(@PathParam("id") adId: Int): Response {
+        val reservation = getOneUseCase.execute(adId)
+        return Response.ok(ReservationDTO.fromReservation(reservation)).build()
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -40,8 +52,8 @@ class ReservationResource {
     )
     fun create(reservationDTO: ReservationDTO): Response {
         val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
-        createUseCase.execute(reservation)
-        return Response.status(Response.Status.CREATED).entity(ReservationDTO.fromReservation(reservation)).build()
+        val createdReservation = createUseCase.execute(reservation)
+        return Response.status(Response.Status.CREATED).entity(ReservationDTO.fromReservation(createdReservation)).build()
     }
 
     @GET

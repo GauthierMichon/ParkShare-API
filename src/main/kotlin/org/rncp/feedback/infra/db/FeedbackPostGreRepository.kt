@@ -21,6 +21,9 @@ class FeedbackPostGreRepository : PanacheRepositoryBase<FeedbackDAO, Int> , Feed
         persistAndFlush(feedbackDAO)
         return feedbackDAO.toFeedback()
     }
+    override fun getById(id: Int): Feedback {
+        return findById(id).toFeedback()
+    }
     override fun getListByAd(feedbackId: Int): List<Feedback> {
         return list("ad.id", feedbackId).map { it.toFeedback() }
     }

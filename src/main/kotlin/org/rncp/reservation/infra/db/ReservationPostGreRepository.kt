@@ -3,7 +3,9 @@ package org.rncp.reservation.infra.db
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
+import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.infra.db.AdPostGreRepository
+import org.rncp.feedback.domain.model.Feedback
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.out.ReservationRepository
 import org.rncp.status.infra.db.StatusPostGreRepository
@@ -17,11 +19,15 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     @Inject
     private lateinit var statusRepository: StatusPostGreRepository
 
-    override fun create(reservation: Reservation) {
+    override fun create(reservation: Reservation): Reservation {
         val ad = adRepository.findById(reservation.adId)
         val status = statusRepository.findById(reservation.statusId)
         val reservationDAO = ReservationDAO(null, ad, reservation.userId, reservation.beginDate, reservation.endDate, status)
         persistAndFlush(reservationDAO)
+        return reservationDAO.toReservation()
+    }
+    override fun getById(id: Int): Reservation {
+        return findById(id).toReservation()
     }
     override fun getListByAd(adId: Int): List<Reservation> {
         return list("ad.id", adId).map { it.toReservation() }
