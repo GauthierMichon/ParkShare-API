@@ -126,14 +126,14 @@ class FeedbackTest {
 
         val badRequestRating2 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 7, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestRating1))
+                .body(Json.encodeToString(badRequestRating2))
                 .post("/api/feedback")
                 .then()
                 .statusCode(400)
 
         val badRequestAdId = FeedbackDTO(null, 0, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestRating1))
+                .body(Json.encodeToString(badRequestAdId))
                 .post("/api/feedback")
                 .then()
                 .statusCode(400)
@@ -156,7 +156,7 @@ class FeedbackTest {
 
         val badRequestRating2 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 7, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestRating1))
+                .body(Json.encodeToString(badRequestRating2))
                 .put("/api/feedback/${feedbackGiven.id}")
                 .then()
                 .statusCode(400)
