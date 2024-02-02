@@ -14,7 +14,7 @@ data class UserDTO(
         val roleId: Int,
 ) {
     companion object {
-        fun fromAd(user: User, link: String): UserDTO {
+        fun fromUser(user: User): UserDTO {
             return UserDTO(
                     id = user.id,
                     uid = user.uid,

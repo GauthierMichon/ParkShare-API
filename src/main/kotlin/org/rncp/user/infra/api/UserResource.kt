@@ -25,6 +25,16 @@ class UserResource {
     fun register(userDTO: UserDTO): Response {
         val user = User(null, null, userDTO.firstname, userDTO.lastname, userDTO.email, userDTO.roleId)
         registerUseCase.execute(user, userDTO.password!!)
+        return Response.ok(UserDTO.fromUser(user)).build()
+    }
+
+    @POST
+    @Path("/login")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    fun login(userDTO: UserDTO): Response {
+
         return Response.ok().build()
     }
 }
