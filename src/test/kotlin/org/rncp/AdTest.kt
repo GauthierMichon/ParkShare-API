@@ -1,107 +1,82 @@
 package org.rncp
 
 import io.quarkus.test.junit.QuarkusTest
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.rncp.ad.infra.api.AdDto
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @QuarkusTest
-@TestMethodOrder(OrderAnnotation::class)
 class AdTest {
 
-    fun clear() {
-        val adsEntity = given()
-                .get("/api/ads")
+    private fun clearAds() {
+        val ads = given().get("/api/ads")
                 .then()
                 .statusCode(200)
                 .extract()
                 .body()
                 .jsonPath()
                 .getList(".", AdDto::class.java)
-        adsEntity.map { adEntity ->
-            given()
-                    .delete("/api/ads/${adEntity.id}")
+
+        ads.forEach { ad ->
+            given().delete("/api/ads/${ad.id}")
                     .then()
                     .statusCode(204)
         }
-
     }
-    @Test
-    @Order(1)
-    fun testCreateAndGetById() {
-        val requestAd = """{
-            "userId": "Testeur",
-            "name": "Gauthier Ad",
-            "description": "Description de test",
-            "hourPrice": 56.3,
-            "latitude": "-0.256245656",
-            "longitude": "30.29562656",
-            "state": true,
-            "link": "y en a pas"
-        }""".trimIndent()
 
-        val adGiven = io.restassured.RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(requestAd)
+    private fun createAd(requestAd: AdDto): AdDto {
+        return given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestAd))
                 .post("/api/ads")
                 .then()
                 .statusCode(201)
                 .extract()
                 .`as`(AdDto::class.java)
+    }
 
-        val adEntity = given()
-                .get("/api/ads/${adGiven.id}")
+    private fun getAdById(adId: Int?): AdDto {
+        return given().get("/api/ads/$adId")
                 .then()
                 .statusCode(200)
                 .extract()
                 .`as`(AdDto::class.java)
+    }
 
-
-        given()
-                .delete("/api/ads/${adGiven.id}")
+    private fun deleteAd(adId: Int?) {
+        given().delete("/api/ads/$adId")
                 .then()
                 .statusCode(204)
-
-
-        val ad = AdDto(adGiven.id, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
-        assertEquals(ad, adEntity)
-
     }
 
     @Test
-    @Order(2)
-    fun testDelete(){
-        clear()
-        val requestAd = """{
-        "userId": "Testeur2",
-        "name": "Gauthier Ad2",
-        "description": "Description de test2",
-        "hourPrice": 56.3,
-        "latitude": "-0.256245656",
-        "longitude": "30.29562656",
-        "state": true,
-        "link": "y en a pas"
-    }""".trimIndent()
+    fun testCreateAndGetById() {
+        clearAds()
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
 
-        val adGiven = io.restassured.RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(requestAd)
-                .post("/api/ads")
-                .then()
-                .statusCode(201)
-                .extract()
-                .`as`(AdDto::class.java)
+        val adGiven = createAd(requestAd)
+        val adEntity = getAdById(adGiven.id)
 
-        given()
-                .delete("/api/ads/${adGiven.id}")
-                .then()
-                .statusCode(204)
+        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
 
-        val adsEntity = given()
-                .get("/api/ads")
+        assertEquals(expectedAd, adEntity)
+    }
+
+    @Test
+    fun testDelete() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
+
+        val adGiven = createAd(requestAd)
+        deleteAd(adGiven.id)
+
+        val adsEntity = given().get("/api/ads")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -110,43 +85,19 @@ class AdTest {
                 .getList(".", AdDto::class.java)
 
         assertEquals(0, adsEntity.size)
-
     }
 
     @Test
-    @Order(3)
-    fun testGetAll(){
-        clear()
-        val requestAd = """{
-        "userId": "Testeur2",
-        "name": "Gauthier Ad2",
-        "description": "Description de test2",
-        "hourPrice": 56.3,
-        "latitude": "-0.256245656",
-        "longitude": "30.29562656",
-        "state": true,
-        "link": "y en a pas"
-    }""".trimIndent()
+    fun testGetAll() {
+        clearAds()
 
-        io.restassured.RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(requestAd)
-                .post("/api/ads")
-                .then()
-                .statusCode(201)
-                .extract()
-                .`as`(AdDto::class.java)
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
 
-        io.restassured.RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(requestAd)
-                .post("/api/ads")
-                .then()
-                .statusCode(201)
-                .extract()
-                .`as`(AdDto::class.java)
-        val adsEntity = given()
-                .get("/api/ads")
+
+        createAd(requestAd)
+        createAd(requestAd)
+
+        val adsEntity = given().get("/api/ads")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -158,19 +109,72 @@ class AdTest {
     }
 
     @Test
-    fun testPublish(){
+    fun testPublish() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", false, "")
+
+        val adGiven = createAd(requestAd)
+
+        given().contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads/${adGiven.id}/publish")
+                .then()
+                .statusCode(200)
+
+        val adPublish = getAdById(adGiven.id)
+
+        assertEquals(adGiven.id, adPublish.id)
+        assertEquals(adGiven.userId, adPublish.userId)
+        assertEquals(adGiven.name, adPublish.name)
+        assertEquals(adGiven.description, adPublish.description)
+        assertEquals(adGiven.hourPrice, adPublish.hourPrice)
+        assertEquals(adGiven.latitude, adPublish.latitude)
+        assertEquals(adGiven.longitude, adPublish.longitude)
+        assertNotEquals(adGiven.state, adPublish.state)
+    }
+
+    @Test
+    fun testUnpublish() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
+
+
+        val adGiven = createAd(requestAd)
+
+        given().contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads/${adGiven.id}/unpublish")
+                .then()
+                .statusCode(200)
+
+        val adUnpublish = getAdById(adGiven.id)
+
+        assertEquals(adGiven.id, adUnpublish.id)
+        assertEquals(adGiven.userId, adUnpublish.userId)
+        assertEquals(adGiven.name, adUnpublish.name)
+        assertEquals(adGiven.description, adUnpublish.description)
+        assertEquals(adGiven.hourPrice, adUnpublish.hourPrice)
+        assertEquals(adGiven.latitude, adUnpublish.latitude)
+        assertEquals(adGiven.longitude, adUnpublish.longitude)
+        assertNotEquals(adGiven.state, adUnpublish.state)
 
     }
 
     @Test
-    fun testUnpublish(){
+    fun testUpdate() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
+        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, "-0.256249191", "30.29562000", false, "")
 
+        val adGiven = createAd(requestAd)
+
+        given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestAdUpdate))
+                .put("/api/ads/${adGiven.id}")
+                .then()
+                .statusCode(200)
+
+        val adUpdate = getAdById(adGiven.id)
+
+        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, "-0.256249191", "30.29562000", false, "")
+
+        assertEquals(expectedAd, adUpdate)
     }
-
-    @Test
-    fun testUpdate(){
-
-    }
-
-
 }

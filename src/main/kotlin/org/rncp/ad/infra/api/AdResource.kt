@@ -42,7 +42,7 @@ class AdResource {
     fun getAll(): List<AdDto> {
         val ads = getAllUseCase.execute()
         return ads.map { ad ->
-            val link = "/api/ads/${ad.userId}"
+            val link = "/api/ads/${ad.id}"
             AdDto.fromAd(ad, link)
         }
     }

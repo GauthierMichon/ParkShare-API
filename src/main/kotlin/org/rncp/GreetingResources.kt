@@ -6,14 +6,6 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 
-@Path("/hello")
-class GreetingResource {
-
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    fun hello() = "Hello from RESTEasy Reactive"
-}
-
 @Path("/api")
 class PingResource {
 
