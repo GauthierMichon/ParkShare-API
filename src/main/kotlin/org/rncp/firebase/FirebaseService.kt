@@ -45,7 +45,6 @@ class FirebaseService {
 
             userRecord.uid
         } catch (e: FirebaseAuthException) {
-            // Gère les erreurs d'authentification Firebase
             null
         }
     }

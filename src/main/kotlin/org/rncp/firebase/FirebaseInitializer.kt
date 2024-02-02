@@ -5,7 +5,6 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseOptions
 import io.quarkus.runtime.Startup
 import jakarta.enterprise.context.ApplicationScoped
-import java.io.FileInputStream
 import java.io.IOException
 
 @ApplicationScoped
@@ -13,7 +12,7 @@ class FirebaseInitializer {
     @Startup
     fun initializeFirebase() {
         try {
-            val serviceAccount = FileInputStream("firebase/firebase-config.json")
+            val serviceAccount = object {}.javaClass.getResourceAsStream("/firebase/firebase-config.json")
 
             val options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -21,11 +20,9 @@ class FirebaseInitializer {
 
             FirebaseApp.initializeApp(options)
 
-            println("Firebase initialisé avec succès.")
 
         } catch (e: IOException) {
-            // Gère les erreurs d'initialisation
-            println("Erreur lors de l'initialisation de Firebase : ${e.message}")
+            println("Erreur d'initialisation firebase : ${e.message}")
             e.printStackTrace()
         }
     }
