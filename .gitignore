@@ -63,3 +63,4 @@ nb-configuration.xml
 /.quarkus/cli/plugins/
 
 #private
+src/main/resources/firebase/firebase-config.json
