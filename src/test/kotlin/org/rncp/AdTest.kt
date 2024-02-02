@@ -5,13 +5,7 @@ import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.rncp.feedback.domain.model.Feedback
-import org.testcontainers.junit.jupiter.Testcontainers
-import java.util.*
-import jakarta.transaction.Transactional
 import org.junit.jupiter.api.*
-import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.infra.api.AdDto
 
 @QuarkusTest
@@ -19,7 +13,7 @@ import org.rncp.ad.infra.api.AdDto
 class AdTest {
 
     fun clear() {
-        val AdsEntity = given()
+        val adsEntity = given()
                 .get("/api/ads")
                 .then()
                 .statusCode(200)
@@ -27,9 +21,9 @@ class AdTest {
                 .body()
                 .jsonPath()
                 .getList(".", AdDto::class.java)
-        AdsEntity.map { AdEntity ->
+        adsEntity.map { adEntity ->
             given()
-                    .delete("/api/ads/${AdEntity.id}")
+                    .delete("/api/ads/${adEntity.id}")
                     .then()
                     .statusCode(204)
         }
@@ -49,17 +43,17 @@ class AdTest {
             "link": "y en a pas"
         }""".trimIndent()
 
-        io.restassured.RestAssured.given()
+        val adGiven = io.restassured.RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(requestAd)
                 .post("/api/ads")
                 .then()
                 .statusCode(201)
                 .extract()
-                .response()
+                .`as`(AdDto::class.java)
 
-        val AdEntity = given()
-                .get("/api/ads/1")
+        val adEntity = given()
+                .get("/api/ads/${adGiven.id}")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -67,20 +61,19 @@ class AdTest {
 
 
         given()
-                .delete("/api/ads/1")
+                .delete("/api/ads/${adGiven.id}")
                 .then()
                 .statusCode(204)
 
 
-        val ad = AdDto(1, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
-        assertEquals(ad, AdEntity)
+        val ad = AdDto(adGiven.id, "Testeur", "Gauthier Ad", "Description de test", 56.3f, "-0.256245656", "30.29562656", true, "")
+        assertEquals(ad, adEntity)
 
     }
 
     @Test
     @Order(2)
     fun testDelete(){
-
         clear()
         val requestAd = """{
         "userId": "Testeur2",
@@ -93,7 +86,48 @@ class AdTest {
         "link": "y en a pas"
     }""".trimIndent()
 
-        // TODO : Récupérer mon Id ici
+        val adGiven = io.restassured.RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads")
+                .then()
+                .statusCode(201)
+                .extract()
+                .`as`(AdDto::class.java)
+
+        given()
+                .delete("/api/ads/${adGiven.id}")
+                .then()
+                .statusCode(204)
+
+        val adsEntity = given()
+                .get("/api/ads")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(0, adsEntity.size)
+
+    }
+
+    @Test
+    @Order(3)
+    fun testGetAll(){
+        clear()
+        val requestAd = """{
+        "userId": "Testeur2",
+        "name": "Gauthier Ad2",
+        "description": "Description de test2",
+        "hourPrice": 56.3,
+        "latitude": "-0.256245656",
+        "longitude": "30.29562656",
+        "state": true,
+        "link": "y en a pas"
+    }""".trimIndent()
+
         io.restassured.RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(requestAd)
@@ -101,14 +135,17 @@ class AdTest {
                 .then()
                 .statusCode(201)
                 .extract()
-                .response()
+                .`as`(AdDto::class.java)
 
-        given()
-                .delete("/api/ads/1")
+        io.restassured.RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads")
                 .then()
-                .statusCode(204)
-
-        val AdsEntity = given()
+                .statusCode(201)
+                .extract()
+                .`as`(AdDto::class.java)
+        val adsEntity = given()
                 .get("/api/ads")
                 .then()
                 .statusCode(200)
@@ -117,23 +154,7 @@ class AdTest {
                 .jsonPath()
                 .getList(".", AdDto::class.java)
 
-        assertEquals(0, AdsEntity.size)
-
-    }
-
-    @Test
-    @Order(3)
-    fun testGetAll(){
-        /*val AdsEntity = given()
-                .get("/api/ads")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", AdDto::class.java)
-
-        assertEquals(0, AdsEntity.size)*/
+        assertEquals(2, adsEntity.size)
     }
 
     @Test
