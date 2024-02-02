@@ -14,10 +14,10 @@ import org.rncp.reservation.domain.ports.out.ReservationRepository
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
 
     @Inject
-    lateinit var feedbackRepository: FeedbackPostGreRepository
+    private lateinit var feedbackRepository: FeedbackPostGreRepository
 
     @Inject
-    lateinit var reservationRepository: ReservationRepository
+    private lateinit var reservationRepository: ReservationRepository
 
     override fun create(ad: Ad): Ad {
         val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
@@ -51,11 +51,11 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
 
 
     override fun delete(adId: Int) {
-        var feedbacks = feedbackRepository.getListByAd(adId)
+        val feedbacks = feedbackRepository.getListByAd(adId)
         feedbacks.map { feedback ->
             feedbackRepository.deleteById(feedback.id)
         }
-        var reservations = reservationRepository.getListByAd(adId)
+        val reservations = reservationRepository.getListByAd(adId)
         reservations.map { reservation ->
             reservationRepository.delete(reservation.id!!)
         }
