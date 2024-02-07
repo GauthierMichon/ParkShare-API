@@ -11,13 +11,14 @@ class DeleteUseCase {
     @Inject
     private lateinit var adRepository: AdRepository
 
-    fun execute(adId: Int) {
+    fun execute(adId: Int): Boolean {
         val activeReservations = adRepository.findActiveReservationsForAd(adId)
 
-        if (activeReservations.isEmpty()) {
+        return if (activeReservations.isEmpty()) {
             adRepository.delete(adId)
+            true
         } else {
-
+            false
         }
     }
 }

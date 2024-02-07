@@ -64,12 +64,7 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     }
 
     override fun findActiveReservationsForAd(adId: Int): List<Reservation> {
-        // TODO : Implémentez la logique pour récupérer les réservations actives pour une annonce
-        // Vous pouvez utiliser des requêtes JPA ou d'autres méthodes selon votre base de données
-        // Retournez la liste des réservations actives
-        return emptyList()
-        //return reservationGetListByAdUseCase.execute(adId)
-        //return mutableListOf<Reservation>(Reservation())
+        return reservationRepository.getListByAd(adId)
     }
 
     override fun publish(adId: Int) {

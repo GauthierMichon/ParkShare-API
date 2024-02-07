@@ -1,6 +1,7 @@
 package org.rncp
 
 import io.quarkus.test.junit.QuarkusTest
+import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -10,6 +11,9 @@ import org.junit.jupiter.api.assertAll
 import org.rncp.ad.infra.api.AdDto
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.rncp.reservation.infra.api.ReservationDTO
+import java.time.LocalDateTime
+import java.time.Month
 
 @QuarkusTest
 class AdTest {
@@ -176,6 +180,25 @@ class AdTest {
         val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
 
         assertEquals(expectedAd, adUpdate)
+    }
+
+    @Test
+    fun testDeleteAdWithActiveReservation() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestReservation))
+                .post("/api/reservation")
+                .then()
+                .statusCode(201)
+                .extract()
+                .`as`(ReservationDTO::class.java)
+
+        given().delete("/api/ads/${adGiven.id!!}")
+                .then()
+                .statusCode(409)
     }
 
     @Test

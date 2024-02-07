@@ -104,7 +104,13 @@ class AdResource {
     @Transactional
     @Path("/{id}")
     fun delete(@PathParam("id") adId: Int): Response {
-        deleteUseCase.execute(adId)
-        return Response.noContent().build()
+        val isDeleted = deleteUseCase.execute(adId)
+        return if (isDeleted) {
+            Response.noContent().build()
+        } else {
+            Response.status(Response.Status.CONFLICT)
+                    .entity("La suppression de l'annonce n'est pas autorisée car des réservations actives sont liées à cette annonce.")
+                    .build()
+        }
     }
 }
