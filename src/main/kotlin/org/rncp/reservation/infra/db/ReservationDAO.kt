@@ -5,6 +5,7 @@ import jakarta.persistence.*
 import org.rncp.ad.infra.db.AdDao
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.status.infra.db.StatusDAO
+import org.rncp.user.infra.db.UserDAO
 import java.time.LocalDateTime
 
 @Entity
@@ -15,16 +16,18 @@ data class ReservationDAO(
         @ManyToOne(targetEntity = AdDao::class, fetch = FetchType.LAZY)
         @JoinColumn(name="ad")
         var ad: AdDao,
-        var userId: String,
+        @ManyToOne(targetEntity = UserDAO::class, fetch = FetchType.LAZY)
+        @JoinColumn(name="user")
+        var user: UserDAO,
         var beginDate: LocalDateTime,
         var endDate: LocalDateTime,
         @ManyToOne(targetEntity = StatusDAO::class, fetch = FetchType.LAZY)
         @JoinColumn(name="status")
         var status: StatusDAO,
 ) : PanacheEntityBase() {
-    constructor() : this(0, AdDao(), "", LocalDateTime.now(), LocalDateTime.now(), StatusDAO())
+    constructor() : this(0, AdDao(), UserDAO(), LocalDateTime.now(), LocalDateTime.now(), StatusDAO())
 
     fun toReservation(): Reservation {
-        return Reservation(id, ad.id!!, userId, beginDate, endDate, status.id!!)
+        return Reservation(id, ad.id!!, user.uid, beginDate, endDate, status.id!!)
     }
 }
