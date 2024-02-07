@@ -113,7 +113,7 @@ class FeedbackTest {
     }
 
     @Test
-    fun testCreateWithBadValues() {
+    fun testCreateWithInvalidRating1() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
         val adGiven = createAd(requestAd)
 
@@ -123,6 +123,12 @@ class FeedbackTest {
                 .post("/api/feedback")
                 .then()
                 .statusCode(400)
+    }
+
+    @Test
+    fun testCreateWithInvalidRating2() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val adGiven = createAd(requestAd)
 
         val badRequestRating2 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 7, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
@@ -130,17 +136,19 @@ class FeedbackTest {
                 .post("/api/feedback")
                 .then()
                 .statusCode(400)
+    }
 
-        val badRequestAdId = FeedbackDTO(null, 0, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+    @Test
+    fun testCreateWithInvalidAdId() {
+        val badRequestAdId = FeedbackDTO(null, 0, "", 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAdId))
                 .post("/api/feedback")
                 .then()
                 .statusCode(400)
-
     }
     @Test
-    fun testUpdateWithBadValues() {
+    fun testUpdateWithInvalidRating1() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
         val adGiven = createAd(requestAd)
 
@@ -153,6 +161,15 @@ class FeedbackTest {
                 .put("/api/feedback/${feedbackGiven.id}")
                 .then()
                 .statusCode(400)
+    }
+
+    @Test
+    fun testUpdateWithInvalidRating2() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestFeedback = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val feedbackGiven = createFeedback(requestFeedback)
 
         val badRequestRating2 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 7, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
         RestAssured.given().contentType(ContentType.JSON)
@@ -160,6 +177,5 @@ class FeedbackTest {
                 .put("/api/feedback/${feedbackGiven.id}")
                 .then()
                 .statusCode(400)
-
     }
 }
