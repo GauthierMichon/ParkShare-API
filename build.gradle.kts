@@ -38,7 +38,9 @@ dependencies {
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
     implementation("com.google.firebase:firebase-admin:9.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
+
 
 group = "org.rncp"
 version = "1.0.0-SNAPSHOT"

@@ -7,7 +7,7 @@ import org.rncp.user.domain.ports.out.UserRepository
 
 @ApplicationScoped
 class UserPostGreRepository: PanacheRepositoryBase<UserDAO, Int>, UserRepository {
-    override fun getByIdUid(uid: String): User {
+    override fun getByUid(uid: String): User {
         return find("uid", uid).firstResult<UserDAO>().toUser()
     }
 
