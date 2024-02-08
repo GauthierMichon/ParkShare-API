@@ -10,6 +10,5 @@ interface AdRepository {
     fun update(adId: Int, adData: Ad): Ad
     fun delete(adId: Int)
     fun findActiveReservationsForAd(adId: Int): List<Reservation>
-    fun publish(adId: Int)
-    fun unpublish(adId: Int)
+    fun save(ad: Ad)
 }

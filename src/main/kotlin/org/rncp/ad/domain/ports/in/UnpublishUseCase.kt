@@ -11,6 +11,10 @@ class UnpublishUseCase {
     private lateinit var adRepository: AdRepository
 
     fun execute(adId: Int) {
-        adRepository.unpublish(adId)
+        val ad = adRepository.getById(adId)
+        if (ad != null) {
+            ad.state = false
+            adRepository.save(ad)
+        }
     }
 }

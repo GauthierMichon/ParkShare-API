@@ -11,6 +11,10 @@ class PublishUseCase {
     private lateinit var adRepository: AdRepository
 
     fun execute(adId: Int) {
-        adRepository.publish(adId)
+        val ad = adRepository.getById(adId)
+        if (ad != null) {
+            ad.state = true
+            adRepository.save(ad)
+        }
     }
 }

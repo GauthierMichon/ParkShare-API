@@ -67,15 +67,12 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return reservationRepository.getListByAd(adId)
     }
 
-    override fun publish(adId: Int) {
-        val adDao = findById(adId)
-        adDao.state = true
-        persistAndFlush(adDao)
-    }
+    override fun save(ad: Ad) {
+        val adDao = findById(ad.id)
 
-    override fun unpublish(adId: Int) {
-        val adDao = findById(adId)
-        adDao.state = false
+        adDao.apply {
+            state = ad.state
+        }
         persistAndFlush(adDao)
     }
 }
