@@ -221,6 +221,17 @@ class AdTest {
     }
 
     @Test
+    fun testUpdateAdDoesNotExist() {
+        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
+
+        given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestAdUpdate))
+                .put("/api/ads/0")
+                .then()
+                .statusCode(404)
+    }
+
+    @Test
     fun testCreateWithNegativeHourPrice() {
         val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", -56.3f, -0.2562456f, 30.295626f, true, "")
         given().contentType(ContentType.JSON)

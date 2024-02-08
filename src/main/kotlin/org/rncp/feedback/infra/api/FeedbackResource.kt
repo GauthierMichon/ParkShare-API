@@ -84,8 +84,7 @@ class FeedbackResource {
             }
         }
 
-        updateUseCase.execute(feedbackId, feedback)
-        return Response.noContent().build()
+        return updateUseCase.execute(feedbackId, feedback)
     }
 
     @DELETE
