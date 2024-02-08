@@ -108,7 +108,7 @@ class ReservationResource {
         val reservation = cancelUseCase.execute(reservationId)
 
         return if (reservation != null) {
-            return Response.ok(ReservationDTO.fromReservation(reservation)).build()
+            return Response.ok().build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()
         }
