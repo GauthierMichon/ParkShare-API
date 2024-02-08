@@ -12,7 +12,7 @@ data class AdDao(
         @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         var id: Int? = null,
         @ManyToOne(targetEntity = UserDAO::class, fetch = FetchType.LAZY)
-        @JoinColumn(name="user")
+        @JoinColumn(name="userId")
         var user: UserDAO,
         var name: String,
         var description: String,

@@ -5,7 +5,7 @@ import jakarta.persistence.*
 import org.rncp.user.domain.model.User
 
 @Entity
-@Table(name="\"user\"")
+@Table(name="app_user")
 data class UserDAO(
         @Id
         val uid: String,

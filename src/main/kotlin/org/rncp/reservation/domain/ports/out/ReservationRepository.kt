@@ -11,5 +11,5 @@ interface ReservationRepository {
     fun getListByStatus(statusId: Int): List<Reservation>
     fun cancel(reservationId: Int): Reservation?
     fun delete(id: Int)
-    fun update(reservationId: Int, reservation: Reservation)
+    fun update(reservation: Reservation)
 }

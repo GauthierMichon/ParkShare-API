@@ -1,10 +1,13 @@
 package org.rncp.reservation.infra.api
 
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
+import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.core.SecurityContext
 import org.eclipse.microprofile.openapi.annotations.Operation
 import org.rncp.ad.domain.ports.`in`.GetAdByIdUseCase
 import org.rncp.ad.infra.api.AdDto
@@ -44,6 +47,7 @@ class ReservationResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Authenticated
     fun getById(@PathParam("id") adId: Int): Response {
         val reservation = getOneUseCase.execute(adId)
         return if (reservation != null) {
@@ -57,10 +61,12 @@ class ReservationResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun create(reservationDTO: ReservationDTO): Response {
-        val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
+    @Authenticated
+    fun create(reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val reservation = Reservation(null, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, reservationCreateOrUpdateDTO.statusId)
 
-        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now()) || reservationDTO.statusId < 1 || reservationDTO.statusId > 3 || getAdbyIdUseCase.execute(reservationDTO.adId) == null) {
+        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3 || getAdbyIdUseCase.execute(reservationCreateOrUpdateDTO.adId) == null) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
 
@@ -71,6 +77,7 @@ class ReservationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/ad/{adId}")
+    @Authenticated
     fun getListByAd(@PathParam("adId") adId: Int): List<ReservationDTO> {
         val reservations = getListByAdUseCase.execute(adId)
         return reservations.map { ReservationDTO.fromReservation(it) }
@@ -79,6 +86,7 @@ class ReservationResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/status/{statusId}")
+    @Authenticated
     fun getListByStatus(@PathParam("statusId") statusId: Int): List<ReservationDTO> {
         val reservations = getListByStatusUseCase.execute(statusId)
         return reservations.map { ReservationDTO.fromReservation(it) }
@@ -89,13 +97,15 @@ class ReservationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     @Transactional
-    fun update(@PathParam("id") reservationId: Int, reservationDTO: ReservationDTO): Response {
-        val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
+    @Authenticated
+    fun update(@PathParam("id") reservationId: Int, reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val reservation = Reservation(reservationId, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, reservationCreateOrUpdateDTO.statusId)
 
-        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now()) || reservationDTO.statusId < 1 || reservationDTO.statusId > 3) {
+        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
-        updateUseCase.execute(reservationId, reservation)
+        updateUseCase.execute(reservation)
         return Response.ok(ReservationDTO.fromReservation(reservation)).build()
     }
 
@@ -104,6 +114,7 @@ class ReservationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @Path("/cancel/{id}")
+    @Authenticated
     fun cancel(@PathParam("id") reservationId: Int): Response {
         val reservation = cancelUseCase.execute(reservationId)
 
@@ -117,6 +128,7 @@ class ReservationResource {
     @DELETE
     @Transactional
     @Path("/{id}")
+    @Authenticated
     fun delete(@PathParam("id") reservationId: Int): Response {
         deleteUseCase.execute(reservationId)
         return Response.noContent().build()

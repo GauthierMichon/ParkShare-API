@@ -8,5 +8,5 @@ interface FeedbackRepository {
     fun getById(id: Int): Feedback?
     fun getListByAd(adId: Int): List<Feedback>
     fun delete(feedbackId: Int)
-    fun update(feedbackId: Int, feedback: Feedback)
+    fun update(feedback: Feedback)
 }

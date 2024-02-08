@@ -55,8 +55,8 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     override fun delete(id: Int) {
         deleteById(id)
     }
-    override fun update(reservationId: Int, reservation: Reservation) {
-        val reservationToUpdate = findById(reservationId)
+    override fun update(reservation: Reservation) {
+        val reservationToUpdate = findById(reservation.id)
         reservationToUpdate.apply {
             ad = adRepository.findById(reservation.adId)
             user = userRepository.find("uid", reservation.userId).firstResult()

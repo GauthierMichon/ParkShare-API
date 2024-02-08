@@ -17,7 +17,7 @@ data class ReservationDAO(
         @JoinColumn(name="ad")
         var ad: AdDao,
         @ManyToOne(targetEntity = UserDAO::class, fetch = FetchType.LAZY)
-        @JoinColumn(name="user")
+        @JoinColumn(name="userId")
         var user: UserDAO,
         var beginDate: LocalDateTime,
         var endDate: LocalDateTime,

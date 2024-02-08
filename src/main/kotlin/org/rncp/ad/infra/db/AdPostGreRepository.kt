@@ -40,16 +40,16 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return adDao.toAd()
     }
 
-    override fun update(adId: Int, adData: Ad): Ad {
-        val adDao = findById(adId)
+    override fun update(ad: Ad): Ad {
+        val adDao = findById(ad.id)
         adDao.apply {
-            name = adData.name
-            user = userRepository.find("uid", adData.userId).firstResult()
-            description = adData.description
-            hourPrice = adData.hourPrice
-            latitude = adData.latitude
-            longitude = adData.longitude
-            state = adData.state
+            name = ad.name
+            user = userRepository.find("uid", ad.userId).firstResult()
+            description = ad.description
+            hourPrice = ad.hourPrice
+            latitude = ad.latitude
+            longitude = ad.longitude
+            state = ad.state
         }
         persistAndFlush(adDao)
         return adDao.toAd()

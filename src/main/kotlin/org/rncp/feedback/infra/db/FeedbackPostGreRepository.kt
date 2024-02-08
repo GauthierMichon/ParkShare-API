@@ -34,8 +34,8 @@ class FeedbackPostGreRepository : PanacheRepositoryBase<FeedbackDAO, Int> , Feed
     override fun getListByAd(adId: Int): List<Feedback> {
         return list("ad.id", adId).map { it.toFeedback() }
     }
-    override fun update(feedbackId: Int, feedback: Feedback) {
-        val feedbackToUpdate = findById(feedbackId)
+    override fun update(feedback: Feedback) {
+        val feedbackToUpdate = findById(feedback.id)
         feedbackToUpdate.apply {
             ad = adRepository.findById(feedback.adId)
             user = userRepository.find("uid", feedback.userId).firstResult()

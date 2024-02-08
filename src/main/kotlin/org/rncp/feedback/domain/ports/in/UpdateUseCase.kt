@@ -10,9 +10,9 @@ import org.rncp.reservation.domain.ports.out.ReservationRepository
 @ApplicationScoped
 class UpdateUseCase {
     @Inject
-    lateinit var feedbackRepository: FeedbackRepository
+    private lateinit var feedbackRepository: FeedbackRepository
 
-    fun execute(feedbackId: Int, feedback: Feedback) {
-        feedbackRepository.update(feedbackId, feedback)
+    fun execute(feedback: Feedback) {
+        feedbackRepository.update(feedback)
     }
 }
