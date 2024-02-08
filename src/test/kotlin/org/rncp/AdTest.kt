@@ -4,6 +4,8 @@ import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
+import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
@@ -12,71 +14,23 @@ import org.rncp.ad.infra.api.AdDto
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.rncp.reservation.infra.api.ReservationDTO
+import org.rncp.reservation.infra.db.ReservationPostGreRepository
 import java.time.LocalDateTime
 import java.time.Month
 
 @QuarkusTest
 class AdTest {
 
-    private fun clearReservations() {
-        val reservationsStatus1 = RestAssured.given().get("/api/reservation/status/1")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
+    @Inject
+    lateinit var reservationPostGreRepository: ReservationPostGreRepository
 
-        reservationsStatus1.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
+    @Inject
+    lateinit var adReservationPostGreRepository: ReservationPostGreRepository
 
-        val reservationsStatus2 = RestAssured.given().get("/api/reservation/status/2")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
-
-        reservationsStatus2.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
-
-        val reservationsStatus3 = RestAssured.given().get("/api/reservation/status/3")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
-
-        reservationsStatus3.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
-    }
-
+    @Transactional
     private fun clearAds() {
-        clearReservations()
-        val ads = given().get("/api/ads")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", AdDto::class.java)
-
-        ads.forEach { ad ->
-            given().delete("/api/ads/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
+        reservationPostGreRepository.deleteAll()
+        adReservationPostGreRepository.deleteAll()
     }
 
     private fun createAd(requestAd: AdDto): AdDto {

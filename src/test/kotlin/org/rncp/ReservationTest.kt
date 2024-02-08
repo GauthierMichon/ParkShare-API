@@ -3,6 +3,8 @@ package org.rncp
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import jakarta.inject.Inject
+import jakarta.transaction.Transactional
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.rncp.ad.infra.api.AdDto
 import org.rncp.feedback.infra.api.FeedbackDTO
 import org.rncp.reservation.infra.api.ReservationDTO
+import org.rncp.reservation.infra.db.ReservationPostGreRepository
 import java.time.LocalDateTime
 import java.time.Month
 import kotlin.random.Random
@@ -17,48 +20,12 @@ import kotlin.random.Random
 @QuarkusTest
 class ReservationTest {
 
-    private fun clearReservations() {
-        val reservationsStatus1 = RestAssured.given().get("/api/reservation/status/1")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
+    @Inject
+    lateinit var reservationPostGreRepository: ReservationPostGreRepository
 
-        reservationsStatus1.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
-
-        val reservationsStatus2 = RestAssured.given().get("/api/reservation/status/2")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
-
-        reservationsStatus2.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
-
-        val reservationsStatus3 = RestAssured.given().get("/api/reservation/status/3")
-                .then()
-                .statusCode(200)
-                .extract()
-                .body()
-                .jsonPath()
-                .getList(".", ReservationDTO::class.java)
-
-        reservationsStatus3.forEach { ad ->
-            RestAssured.given().delete("/api/reservation/${ad.id}")
-                    .then()
-                    .statusCode(204)
-        }
+    @Transactional
+    fun clearReservations() {
+        reservationPostGreRepository.deleteAll()
     }
 
     private fun createAd(requestAd: AdDto): AdDto {
