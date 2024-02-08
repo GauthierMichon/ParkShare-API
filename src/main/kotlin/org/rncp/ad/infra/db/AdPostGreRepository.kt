@@ -34,7 +34,7 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return adDao.toAd()
     }
 
-    override fun update(adId: Int, adData: Ad): Ad {
+    override fun update(adId: Int, adData: Ad) {
         val adDao = findById(adId)
 
         adDao.apply {
@@ -46,7 +46,6 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
             state = adData.state
         }
         persistAndFlush(adDao)
-        return adDao.toAd()
     }
 
 

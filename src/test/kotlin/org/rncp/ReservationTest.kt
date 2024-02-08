@@ -198,8 +198,6 @@ class ReservationTest {
                 .post("/api/reservation/cancel/${reservationGiven.id}")
                 .then()
                 .statusCode(200)
-                .extract()
-                .`as`(ReservationDTO::class.java)
 
         val reservationEntity = getReservationById(reservationGiven.id)
 
@@ -221,7 +219,7 @@ class ReservationTest {
                 .body(Json.encodeToString(requestReservationUpdate))
                 .put("/api/reservation/${reservationGiven.id}")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
 
         val reservationUpdate = getReservationById(reservationGiven.id)
         val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 21, 19, 42, 13), 2)

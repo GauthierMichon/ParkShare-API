@@ -97,7 +97,7 @@ class FeedbackTest {
                 .body(Json.encodeToString(requestFeedbackUpdate))
                 .put("/api/feedback/${feedbackGiven.id}")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
 
         val feedbackUpdate = getFeedbackById(feedbackGiven.id)
         val expectedFeedback = FeedbackDTO(feedbackGiven.id, adGiven.id!!, adGiven.userId, 2, "Pas ouf", LocalDateTime.of(2023, Month.SEPTEMBER, 21, 11, 38, 43))

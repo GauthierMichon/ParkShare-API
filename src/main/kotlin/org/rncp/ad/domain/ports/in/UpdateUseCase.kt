@@ -12,7 +12,7 @@ class UpdateUseCase {
     @Inject
     private lateinit var adRepository: AdRepository
 
-    fun execute(adId: Int, adData: Ad): Ad {
-        return adRepository.update(adId, adData)
+    fun execute(adId: Int, adData: Ad) {
+        adRepository.update(adId, adData)
     }
 }

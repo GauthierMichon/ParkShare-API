@@ -85,7 +85,7 @@ class FeedbackResource {
         }
 
         updateUseCase.execute(feedbackId, feedback)
-        return Response.ok(FeedbackDTO.fromFeedback(feedback)).build()
+        return Response.noContent().build()
     }
 
     @DELETE

@@ -96,7 +96,7 @@ class ReservationResource {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
         updateUseCase.execute(reservationId, reservation)
-        return Response.ok(ReservationDTO.fromReservation(reservation)).build()
+        return Response.noContent().build()
     }
 
     @POST
@@ -105,13 +105,7 @@ class ReservationResource {
     @Transactional
     @Path("/cancel/{id}")
     fun cancel(@PathParam("id") reservationId: Int): Response {
-        val reservation = cancelUseCase.execute(reservationId)
-
-        return if (reservation != null) {
-            return Response.ok().build()
-        } else {
-            Response.status(Response.Status.NOT_FOUND).build()
-        }
+        return cancelUseCase.execute(reservationId)
     }
 
     @DELETE

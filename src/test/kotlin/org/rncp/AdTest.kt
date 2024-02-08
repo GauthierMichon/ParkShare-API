@@ -218,7 +218,7 @@ class AdTest {
                 .body(Json.encodeToString(requestAdUpdate))
                 .put("/api/ads/${adGiven.id}")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
 
         val adUpdate = getAdById(adGiven.id)
 

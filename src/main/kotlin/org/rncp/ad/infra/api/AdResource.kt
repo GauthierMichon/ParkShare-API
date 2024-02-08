@@ -78,8 +78,8 @@ class AdResource {
         if (adDto.hourPrice < 0f || adDto.latitude < -90 || adDto.latitude > 90 || adDto.longitude < -180 || adDto.longitude > 180) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
-        val updatedAd = updateUseCase.execute(adId, adData)
-        return Response.ok(AdDto.fromAd(updatedAd, "")).build()
+        updateUseCase.execute(adId, adData)
+        return Response.noContent().build()
     }
 
     @POST

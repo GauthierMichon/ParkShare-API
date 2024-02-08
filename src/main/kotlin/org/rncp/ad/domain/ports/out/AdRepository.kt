@@ -7,7 +7,7 @@ interface AdRepository {
     fun create(ad: Ad): Ad
     fun getAll(): List<Ad>
     fun getById(id: Int): Ad?
-    fun update(adId: Int, adData: Ad): Ad
+    fun update(adId: Int, adData: Ad)
     fun delete(adId: Int)
     fun findActiveReservationsForAd(adId: Int): List<Reservation>
     fun save(ad: Ad)
