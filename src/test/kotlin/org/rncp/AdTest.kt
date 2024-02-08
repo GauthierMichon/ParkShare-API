@@ -24,13 +24,26 @@ class AdTest {
     @Inject
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
 
-    @Inject
-    lateinit var adReservationPostGreRepository: ReservationPostGreRepository
-
     @Transactional
-    private fun clearAds() {
+    fun clearReservations() {
         reservationPostGreRepository.deleteAll()
-        adReservationPostGreRepository.deleteAll()
+    }
+
+    private fun clearAds() {
+        clearReservations()
+        val ads = given().get("/api/ads")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        ads.forEach { ad ->
+            given().delete("/api/ads/${ad.id}")
+                    .then()
+                    .statusCode(204)
+        }
     }
 
     private fun createAd(requestAd: AdDto): AdDto {
