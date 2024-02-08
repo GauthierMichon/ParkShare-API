@@ -167,7 +167,7 @@ class AdTest {
                 .body(requestAd)
                 .post("/api/ads/${adGiven.id}/publish")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
 
         val adPublish = getAdById(adGiven.id)
 
@@ -192,7 +192,7 @@ class AdTest {
                 .body(requestAd)
                 .post("/api/ads/${adGiven.id}/unpublish")
                 .then()
-                .statusCode(200)
+                .statusCode(204)
 
         val adUnpublish = getAdById(adGiven.id)
 
@@ -366,6 +366,28 @@ class AdTest {
                 .put("/api/ads/${adGiven.id}")
                 .then()
                 .statusCode(400)
+    }
+
+    @Test
+    fun testPublishAdDoesNotExist() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+
+        given().contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads/0/publish")
+                .then()
+                .statusCode(404)
+    }
+
+    @Test
+    fun testUnpublishAdDoesNotExist() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+
+        given().contentType(ContentType.JSON)
+                .body(requestAd)
+                .post("/api/ads/0/unpublish")
+                .then()
+                .statusCode(404)
     }
 
 

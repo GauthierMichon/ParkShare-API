@@ -87,8 +87,7 @@ class AdResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     fun publish(@PathParam("id") adId: Int): Response {
-        publishUseCase.execute(adId)
-        return Response.ok().build()
+        return publishUseCase.execute(adId)
     }
 
     @POST
@@ -96,8 +95,7 @@ class AdResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     fun unpublish(@PathParam("id") adId: Int): Response {
-        unpublishUseCase.execute(adId)
-        return Response.ok().build()
+        return unpublishUseCase.execute(adId)
     }
 
     @DELETE
