@@ -5,9 +5,11 @@ INSERT INTO status (label) VALUES
 
 
 INSERT INTO ad (hourprice, state, description, latitude, longitude, name, userId) VALUES
-(2.0, true, 'coucou', 2.01285895, -2.095629599, 'test', 'fdfvreferg'),
-(2.0, true, 'coucou2', 2.01285895, -2.095629599, 'test2', 'fdfvreferg'),
-(2.0, true, 'coucou3', 2.01285895, -2.095629599, 'test3', 'fdfvreferg');
+(2.0, true, 'coucou', 48.8566, 2.3522, 'test', 'fdfvreferg'),
+(2.0, true, 'coucou2', 48.8666, 2.3722, 'test2', 'fdfvreferg'),
+(2.0, true, 'coucou3', 48.8466, 2.3322, 'test3', 'fdfvreferg'),
+(2.0, true, 'coucou4', 48.8566, 2.4889, 'test4', 'fdfvreferg'),
+(2.0, true, 'coucou5', 48.8566, 2.4888, 'test5', 'fdfvreferg');
 
 INSERT INTO reservation (ad, status, beginDate, endDate, userId) VALUES
     (1, 1, '2022-06-12', '2022-06-16', 'vbggtrgrr'),
