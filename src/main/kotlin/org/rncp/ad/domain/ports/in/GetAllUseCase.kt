@@ -3,6 +3,8 @@ package org.rncp.ad.domain.ports.`in`
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.rncp.ad.domain.model.Ad
+import org.rncp.ad.domain.model.SortField
+import org.rncp.ad.domain.model.SortType
 import org.rncp.ad.domain.ports.out.AdRepository
 import org.rncp.feedback.domain.ports.out.FeedbackRepository
 import org.rncp.reservation.domain.ports.out.ReservationRepository
@@ -27,7 +29,9 @@ class GetAllUseCase {
             beginDate: String?,
             endDate: String?,
             minRate: Double?,
-            maxHourPrice: Double?): List<Ad> {
+            maxHourPrice: Double?,
+            sortField: SortField?,
+            sortType: SortType?): List<Ad> {
         val allAds =  adRepository.getAll()
         var filteredAds = allAds
 
@@ -56,6 +60,14 @@ class GetAllUseCase {
         if (maxHourPrice != null) {
             filteredAds = filteredAds.filter { ad ->
                 ad.hourPrice <= maxHourPrice
+            }
+        }
+
+        // Trier les annonces
+        if (sortField != null && sortType != null) {
+            filteredAds = when (sortField) {
+                SortField.HOUR_PRICE -> sortAdsByHourPrice(filteredAds, sortType)
+                SortField.RATING -> sortAdsByRating(filteredAds, sortType)
             }
         }
 
@@ -117,4 +129,25 @@ class GetAllUseCase {
         return true
     }
 
+    private fun sortAdsByHourPrice(ads: List<Ad>, sortType: SortType): List<Ad> {
+        return when (sortType) {
+            SortType.ASC -> ads.sortedBy { it.hourPrice }
+            SortType.DESC -> ads.sortedByDescending { it.hourPrice }
+        }
+    }
+
+    private fun sortAdsByRating(ads: List<Ad>, sortType: SortType): List<Ad> {
+        return when (sortType) {
+            SortType.ASC -> ads.sortedBy { ad ->
+                val feedbacks = feedbackRepository.getListByAd(ad.id!!)
+                val averageRating = feedbacks.mapNotNull { it.rating }.average()
+                averageRating ?: Double.MIN_VALUE
+            }
+            SortType.DESC -> ads.sortedByDescending { ad ->
+                val feedbacks = feedbackRepository.getListByAd(ad.id!!)
+                val averageRating = feedbacks.mapNotNull { it.rating }.average()
+                averageRating ?: Double.MAX_VALUE
+            }
+        }
+    }
 }

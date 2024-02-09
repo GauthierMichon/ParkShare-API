@@ -6,6 +6,8 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.rncp.ad.domain.model.Ad
+import org.rncp.ad.domain.model.SortField
+import org.rncp.ad.domain.model.SortType
 import org.rncp.ad.domain.ports.`in`.*
 
 @Path("/api/ads")
@@ -41,9 +43,11 @@ class AdResource {
             @QueryParam("beginDate") beginDate: String?,
             @QueryParam("endDate") endDate: String?,
             @QueryParam("minRate") minRate: Double?,
-            @QueryParam("maxHourPrice") maxHourPrice: Double?
+            @QueryParam("maxHourPrice") maxHourPrice: Double?,
+            @QueryParam("sortField") sortField: SortField?,
+            @QueryParam("sortType") sortType: SortType?
     ): List<AdDto> {
-        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate, minRate, maxHourPrice)
+        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate, minRate, maxHourPrice, sortField, sortType)
         return ads.map { ad ->
             val link = "/api/ads/${ad.id}"
             AdDto.fromAd(ad, link)
