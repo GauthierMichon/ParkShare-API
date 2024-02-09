@@ -11,7 +11,16 @@ class GetAllUseCase {
     @Inject
     private lateinit var adRepository: AdRepository
 
-    fun execute(): List<Ad> {
-        return adRepository.getAll()
+    fun execute(latitude: Double, longitude: Double, maxDistanceKm: Double): List<Ad> {
+        val allAds =  adRepository.getAll()
+
+        /*val filteredAds = allAds.filter { ad ->
+            val distance = calculateDistance(latitude, longitude, ad.latitude, ad.longitude)
+            distance <= maxDistanceKm
+        }*/
+
+        return allAds
     }
+
+
 }

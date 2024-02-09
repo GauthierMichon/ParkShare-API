@@ -34,8 +34,12 @@ class AdResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    fun getAll(): List<AdDto> {
-        val ads = getAllUseCase.execute()
+    fun getAll(
+            @QueryParam("latitude") latitude: Double,
+            @QueryParam("longitude") longitude: Double,
+            @QueryParam("distance") distance: Double
+    ): List<AdDto> {
+        val ads = getAllUseCase.execute(latitude, longitude, distance)
         return ads.map { ad ->
             val link = "/api/ads/${ad.id}"
             AdDto.fromAd(ad, link)

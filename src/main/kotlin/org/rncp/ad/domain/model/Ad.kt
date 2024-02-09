@@ -5,10 +5,10 @@ data class Ad(
         var userId: String,
         var name: String,
         var description: String,
-        var hourPrice: Float,
-        var latitude: Float,
-        var longitude: Float,
+        var hourPrice: Double,
+        var latitude: Double,
+        var longitude: Double,
         var state: Boolean,
 ) {
-    constructor() : this(null,"", "", "", 0.0f, 0.0f, 0.0f, false)
+    constructor() : this(null,"", "", "", 0.0, 0.0, 0.0, false)
 }

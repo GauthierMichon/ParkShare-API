@@ -73,12 +73,12 @@ class AdTest {
     @Test
     fun testCreateAndGetById() {
         clearAds()
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         val adGiven = createAd(requestAd)
         val adEntity = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         assertEquals(expectedAd, adEntity)
     }
@@ -87,7 +87,7 @@ class AdTest {
     fun testDelete() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         val adGiven = createAd(requestAd)
         deleteAd(adGiven.id)
@@ -107,7 +107,7 @@ class AdTest {
     fun testGetAll() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
 
         createAd(requestAd)
@@ -126,7 +126,7 @@ class AdTest {
 
     @Test
     fun testPublish() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
         val adGiven = createAd(requestAd)
 
@@ -150,7 +150,7 @@ class AdTest {
 
     @Test
     fun testUnpublish() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
 
         val adGiven = createAd(requestAd)
@@ -176,8 +176,8 @@ class AdTest {
 
     @Test
     fun testUpdate() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
-        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         val adGiven = createAd(requestAd)
 
@@ -189,14 +189,14 @@ class AdTest {
 
         val adUpdate = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
+        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         assertEquals(expectedAd, adUpdate)
     }
 
     @Test
     fun testDeleteAdWithActiveReservation() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -222,7 +222,7 @@ class AdTest {
 
     @Test
     fun testUpdateAdDoesNotExist() {
-        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
+        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestAdUpdate))
@@ -233,7 +233,7 @@ class AdTest {
 
     @Test
     fun testCreateWithNegativeHourPrice() {
-        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", -56.3f, -0.2562456f, 30.295626f, true, "")
+        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", -56.3, -0.2562456, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -243,7 +243,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLatitudeNegative() {
-        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -100.25624f, 30.295626f, true, "")
+        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -100.25624, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -253,7 +253,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLatitudePositive() {
-        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, 100.25624f, 30.295626f, true, "")
+        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 100.25624, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -263,7 +263,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLongitudeNegative() {
-        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, -300.9562f, true, "")
+        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, -300.9562, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -273,7 +273,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLongitudePositive() {
-        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 300.9562f, true, "")
+        val badRequestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 300.9562, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -283,10 +283,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithNegativeHourPrice() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestHourPrice = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", -56.3f, -0.2562456f, 30.295626f, true, "")
+        val badRequestHourPrice = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", -56.3, -0.2562456, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestHourPrice))
                 .put("/api/ads/${adGiven.id}")
@@ -296,10 +296,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLatitudeNegative() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLatitudeNegative = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -100.25624f, 30.295626f, true, "")
+        val badRequestLatitudeNegative = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -100.25624, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLatitudeNegative))
                 .put("/api/ads/${adGiven.id}")
@@ -309,10 +309,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLatitudePositive() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLatitudePositive = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, 100.25624f, 30.295626f, true, "")
+        val badRequestLatitudePositive = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 100.25624, 30.295626, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLatitudePositive))
                 .put("/api/ads/${adGiven.id}")
@@ -322,10 +322,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLongitudeNegative() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLongitudeNegative = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, -300.9562f, true, "")
+        val badRequestLongitudeNegative = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, -300.9562, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLongitudeNegative))
                 .put("/api/ads/${adGiven.id}")
@@ -335,10 +335,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLongitudePositive() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLongitudePositive = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 300.9562f, true, "")
+        val badRequestLongitudePositive = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 300.9562, true, "")
         given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLongitudePositive))
                 .put("/api/ads/${adGiven.id}")
@@ -348,7 +348,7 @@ class AdTest {
 
     @Test
     fun testPublishAdDoesNotExist() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
         given().contentType(ContentType.JSON)
                 .body(requestAd)
@@ -359,7 +359,7 @@ class AdTest {
 
     @Test
     fun testUnpublishAdDoesNotExist() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
         given().contentType(ContentType.JSON)
                 .body(requestAd)
