@@ -56,6 +56,15 @@ class AdTest {
                 .`as`(AdDto::class.java)
     }
 
+    private fun createReservation(requestReservation: ReservationDTO): ReservationDTO {
+        return RestAssured.given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestReservation))
+                .post("/api/reservation")
+                .then()
+                .statusCode(201)
+                .extract()
+                .`as`(ReservationDTO::class.java)
+    }
     private fun getAdById(adId: Int?): AdDto {
         return given().get("/api/ads/$adId")
                 .then()
@@ -146,6 +155,48 @@ class AdTest {
                 .getList(".", AdDto::class.java)
 
         assertEquals(3, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithDateFilterTrue() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        createReservation(requestReservation)
+
+        val adsEntity = given().get("/api/ads?beginDate=2024-09-19T09:00:00&endDate=2024-09-19T10:00:00")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(1, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithDateFilterFalse() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        createReservation(requestReservation)
+
+        val adsEntity = given().get("/api/ads?beginDate=2024-09-20T09:00:00&endDate=2024-09-21T10:00:00")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(0, adsEntity.size)
     }
 
     @Test
