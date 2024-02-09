@@ -26,7 +26,8 @@ class GetAllUseCase {
             maxDistanceKm: Double?,
             beginDate: String?,
             endDate: String?,
-            minRate: Double?): List<Ad> {
+            minRate: Double?,
+            maxHourPrice: Double?): List<Ad> {
         val allAds =  adRepository.getAll()
         var filteredAds = allAds
 
@@ -49,6 +50,12 @@ class GetAllUseCase {
                 val averageRating = feedbacks.mapNotNull { it.rating }.average()
 
                 averageRating >= minRate
+            }
+        }
+
+        if (maxHourPrice != null) {
+            filteredAds = filteredAds.filter { ad ->
+                ad.hourPrice <= maxHourPrice
             }
         }
 

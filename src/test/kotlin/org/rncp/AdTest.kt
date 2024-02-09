@@ -263,6 +263,32 @@ class AdTest {
     }
 
     @Test
+    fun testGetAllWithMaxHourPrice() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd2 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 16.3, 48.8666, 2.3722, true, "")
+        val requestAd3 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 6.3, 48.8666, 2.3722, true, "")
+        val requestAd4 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 8.9, 48.8666, 2.3722, true, "")
+        val requestAd5 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 11.3, 48.8666, 2.3722, true, "")
+        createAd(requestAd)
+        createAd(requestAd2)
+        createAd(requestAd3)
+        createAd(requestAd4)
+        createAd(requestAd5)
+
+        val adsEntity = given().get("/api/ads?maxHourPrice=15.2")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(3, adsEntity.size)
+    }
+
+    @Test
     fun testPublish() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
