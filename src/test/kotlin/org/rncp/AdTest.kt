@@ -109,7 +109,6 @@ class AdTest {
 
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
-
         createAd(requestAd)
         createAd(requestAd)
 
@@ -122,6 +121,31 @@ class AdTest {
                 .getList(".", AdDto::class.java)
 
         assertEquals(2, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithLocationFilter() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd2 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8466, 2.3322, true, "")
+        val requestAd3 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4889, true, "")
+        val requestAd4 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4888, true, "")
+
+        createAd(requestAd)
+        createAd(requestAd2)
+        createAd(requestAd3)
+        createAd(requestAd4)
+
+        val adsEntity = given().get("/api/ads?latitude=48.8566&longitude=2.3522&distance=10.0")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(3, adsEntity.size)
     }
 
     @Test

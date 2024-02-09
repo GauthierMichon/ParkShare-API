@@ -4,6 +4,8 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
+import org.rncp.reservation.domain.ports.out.ReservationRepository
+import java.time.LocalDateTime
 
 @ApplicationScoped
 class GetAllUseCase {
@@ -11,18 +13,32 @@ class GetAllUseCase {
     @Inject
     private lateinit var adRepository: AdRepository
 
-    fun execute(latitude: Double, longitude: Double, maxDistanceKm: Double): List<Ad> {
-        val allAds =  adRepository.getAll()
+    @Inject
+    private lateinit var reservationRepository: ReservationRepository
 
-        return if (latitude != 0.0 && longitude != 0.0 && maxDistanceKm != 0.0) {
-            allAds.filter { ad ->
+    fun execute(
+            latitude: Double?,
+            longitude: Double?,
+            maxDistanceKm: Double?,
+            beginDate: String?,
+            endDate: String?): List<Ad> {
+        val allAds =  adRepository.getAll()
+        var filteredAds = allAds
+
+        if (latitude != null && longitude != null && maxDistanceKm != null) {
+            filteredAds = allAds.filter { ad ->
                 val distance = calculateDistance(latitude, longitude, ad.latitude, ad.longitude)
                 distance <= maxDistanceKm
             }
-        } else {
-            allAds
         }
 
+        if (beginDate != null && endDate != null) {
+            filteredAds = allAds.filter { ad ->
+                isAdAvailable(ad, LocalDateTime.parse(beginDate), LocalDateTime.parse(endDate))
+            }
+        }
+
+        return filteredAds
     }
 
     private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
@@ -50,6 +66,34 @@ class GetAllUseCase {
         return distance
     }
 
+    private fun isAdAvailable(ad: Ad, beginDate: LocalDateTime?, endDate: LocalDateTime?): Boolean {
+        // Filtrer les réservations pour cette annonce
+        val reservations = ad.id?.let { reservationRepository.getListByAd(it) }
 
+        // Si la période n'est pas spécifiée, l'annonce est toujours considérée comme disponible
+        if (beginDate == null || endDate == null) {
+            return true
+        }
+
+        // Vérifier si une réservation chevauche la période spécifiée
+        if (reservations != null) {
+            if (reservations.any { reservation ->
+                        reservation.endDate.isAfter(beginDate) && reservation.beginDate.isBefore(endDate)
+                    }) {
+                // Il y a une réservation qui chevauche la période spécifiée
+                return false
+            }
+
+            if (reservations.any { reservation ->
+                        endDate.isAfter(reservation.beginDate) && beginDate.isBefore(reservation.endDate)
+                    }) {
+                // La période spécifiée chevauche une réservation existante
+                return false
+            }
+        }
+
+        // Aucun chevauchement trouvé, l'annonce est disponible
+        return true
+    }
 
 }
