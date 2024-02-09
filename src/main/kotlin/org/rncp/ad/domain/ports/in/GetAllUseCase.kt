@@ -64,10 +64,11 @@ class GetAllUseCase {
         }
 
         // Trier les annonces
-        if (sortField != null && sortType != null) {
+        if (sortField != null && sortType != null && latitude != null && longitude != null) {
             filteredAds = when (sortField) {
                 SortField.HOUR_PRICE -> sortAdsByHourPrice(filteredAds, sortType)
                 SortField.RATING -> sortAdsByRating(filteredAds, sortType)
+                SortField.DISTANCE -> sortAdsByDistance(filteredAds, sortType, latitude, longitude)
             }
         }
 
@@ -147,6 +148,17 @@ class GetAllUseCase {
                 val feedbacks = feedbackRepository.getListByAd(ad.id!!)
                 val averageRating = feedbacks.mapNotNull { it.rating }.average()
                 averageRating ?: Double.MAX_VALUE
+            }
+        }
+    }
+
+    private fun sortAdsByDistance(ads: List<Ad>, sortType: SortType, latitude: Double, longitude: Double): List<Ad> {
+        return when (sortType) {
+            SortType.ASC -> ads.sortedBy { ad ->
+                calculateDistance(latitude, longitude, ad.latitude, ad.longitude)
+            }
+            SortType.DESC -> ads.sortedByDescending { ad ->
+                calculateDistance(latitude, longitude, ad.latitude, ad.longitude)
             }
         }
     }

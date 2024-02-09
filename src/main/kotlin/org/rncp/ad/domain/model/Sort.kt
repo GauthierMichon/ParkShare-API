@@ -7,5 +7,6 @@ enum class SortType {
 
 enum class SortField {
     HOUR_PRICE,
-    RATING
+    RATING,
+    DISTANCE
 }
