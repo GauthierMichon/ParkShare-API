@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
+import org.rncp.feedback.domain.ports.out.FeedbackRepository
 import org.rncp.reservation.domain.ports.out.ReservationRepository
 import java.time.LocalDateTime
 
@@ -16,25 +17,38 @@ class GetAllUseCase {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
+    @Inject
+    private lateinit var feedbackRepository: FeedbackRepository
+
     fun execute(
             latitude: Double?,
             longitude: Double?,
             maxDistanceKm: Double?,
             beginDate: String?,
-            endDate: String?): List<Ad> {
+            endDate: String?,
+            minRate: Double?): List<Ad> {
         val allAds =  adRepository.getAll()
         var filteredAds = allAds
 
         if (latitude != null && longitude != null && maxDistanceKm != null) {
-            filteredAds = allAds.filter { ad ->
+            filteredAds = filteredAds.filter { ad ->
                 val distance = calculateDistance(latitude, longitude, ad.latitude, ad.longitude)
                 distance <= maxDistanceKm
             }
         }
 
         if (beginDate != null && endDate != null) {
-            filteredAds = allAds.filter { ad ->
+            filteredAds = filteredAds.filter { ad ->
                 isAdAvailable(ad, LocalDateTime.parse(beginDate), LocalDateTime.parse(endDate))
+            }
+        }
+
+        if (minRate != null) {
+            filteredAds = filteredAds.filter { ad ->
+                val feedbacks = feedbackRepository.getListByAd(ad.id!!)
+                val averageRating = feedbacks.mapNotNull { it.rating }.average()
+
+                averageRating >= minRate
             }
         }
 

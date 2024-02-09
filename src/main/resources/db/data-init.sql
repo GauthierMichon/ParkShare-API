@@ -19,4 +19,5 @@ INSERT INTO reservation (ad, status, beginDate, endDate, userId) VALUES
 INSERT INTO feedback (ad, rating, description, date, userId) VALUES
 (1, 5, 'coucou', '2023-10-04', 'fegfegegtger'),
 (1, 5, 'coucou2', '2023-10-04', 'fegfegegtger'),
-(1, 5, 'coucou3', '2023-10-04', 'fegfegegtger');
+(1, 5, 'coucou3', '2023-10-04', 'fegfegegtger'),
+(1, 4, 'coucou4', '2023-10-04', 'fegfegegtger');

@@ -39,9 +39,10 @@ class AdResource {
             @QueryParam("longitude") longitude: Double?,
             @QueryParam("distance") distance: Double?,
             @QueryParam("beginDate") beginDate: String?,
-            @QueryParam("endDate") endDate: String?
+            @QueryParam("endDate") endDate: String?,
+            @QueryParam("minRate") minRate: Double?
     ): List<AdDto> {
-        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate)
+        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate, minRate)
         return ads.map { ad ->
             val link = "/api/ads/${ad.id}"
             AdDto.fromAd(ad, link)

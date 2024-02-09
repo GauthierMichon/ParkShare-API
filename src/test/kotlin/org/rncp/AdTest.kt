@@ -9,10 +9,10 @@ import jakarta.transaction.Transactional
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertAll
 import org.rncp.ad.infra.api.AdDto
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.rncp.feedback.infra.api.FeedbackDTO
 import org.rncp.reservation.infra.api.ReservationDTO
 import org.rncp.reservation.infra.db.ReservationPostGreRepository
 import java.time.LocalDateTime
@@ -65,6 +65,17 @@ class AdTest {
                 .extract()
                 .`as`(ReservationDTO::class.java)
     }
+
+    private fun createFeedback(requestFeedback: FeedbackDTO): FeedbackDTO {
+        return RestAssured.given().contentType(ContentType.JSON)
+                .body(Json.encodeToString(requestFeedback))
+                .post("/api/feedback")
+                .then()
+                .statusCode(201)
+                .extract()
+                .`as`(FeedbackDTO::class.java)
+    }
+
     private fun getAdById(adId: Int?): AdDto {
         return given().get("/api/ads/$adId")
                 .then()
@@ -189,6 +200,58 @@ class AdTest {
         createReservation(requestReservation)
 
         val adsEntity = given().get("/api/ads?beginDate=2024-09-20T09:00:00&endDate=2024-09-21T10:00:00")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(0, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithRatingFilterTrue() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestFeedbackRating5 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating4 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating4)
+
+        val adsEntity = given().get("/api/ads?minRate=4.7")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(1, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithRatingFilterFalse() {
+        clearAds()
+
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestFeedbackRating5 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating4 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating5)
+        createFeedback(requestFeedbackRating4)
+
+        val adsEntity = given().get("/api/ads?minRate=4.8")
                 .then()
                 .statusCode(200)
                 .extract()
