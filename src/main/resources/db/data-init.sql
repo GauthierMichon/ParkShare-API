@@ -12,9 +12,9 @@ INSERT INTO ad (hourprice, state, description, latitude, longitude, name, userId
 (14.7, true, 'coucou5', 48.8566, 2.4888, 'test5', 'fdfvreferg');
 
 INSERT INTO reservation (ad, status, beginDate, endDate, userId) VALUES
-    (1, 1, '2024-06-12', '2024-06-16', 'vbggtrgrr'),
-    (1, 1, '2024-06-18', '2024-06-22', 'vbggtrgrr'),
-    (1, 1, '2024-07-12', '2024-07-16', 'vbggtrgrr');
+    (1, 2, '2024-06-12', '2024-06-16', 'vbggtrgrr'),
+    (1, 2, '2024-06-18', '2024-06-22', 'vbggtrgrr'),
+    (1, 2, '2024-07-12', '2024-07-16', 'vbggtrgrr');
 
 INSERT INTO feedback (ad, rating, description, date, userId) VALUES
 (1, 5, 'coucou', '2023-10-04', 'fegfegegtger'),

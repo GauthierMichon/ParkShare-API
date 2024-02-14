@@ -71,12 +71,12 @@ class ReservationTest {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
         val reservationGiven = createReservation(requestReservation)
 
         val reservationEntity = getReservationById(reservationGiven.id)
 
-        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
 
         Assertions.assertEquals(expectedReservation, reservationEntity)
     }
@@ -96,14 +96,28 @@ class ReservationTest {
         for (i in 0..20) {
             val randomAdIdIndex = Random.nextInt(0, 3)
             val randomStatus = Random.nextInt(1, 4)
-            when (randomStatus) {
-                1 -> countStatus1++
-                2 -> countStatus2++
-                3 -> countStatus3++
-            }
-
             val requestReservation = ReservationDTO(null, adIdsList[randomAdIdIndex], adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), randomStatus)
-            createReservation(requestReservation)
+            val reservationGiven = createReservation(requestReservation)
+
+            when (randomStatus) {
+                1 -> {
+                    countStatus1++
+                    RestAssured.given()
+                            .contentType(ContentType.JSON)
+                            .post("/api/reservation/accept/${reservationGiven.id}")
+                            .then()
+                            .statusCode(200)
+                }
+                2 -> countStatus2++
+                3 -> {
+                    countStatus3++
+                    RestAssured.given()
+                            .contentType(ContentType.JSON)
+                            .post("/api/reservation/cancel/${reservationGiven.id}")
+                            .then()
+                            .statusCode(200)
+                }
+            }
         }
 
         val reservationsStatus1 = RestAssured.given().get("/api/reservation/status/1")
@@ -174,6 +188,27 @@ class ReservationTest {
     }
 
     @Test
+    fun testAccept() {
+        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val reservationGiven = createReservation(requestReservation)
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .post("/api/reservation/accept/${reservationGiven.id}")
+                .then()
+                .statusCode(200)
+
+        val reservationEntity = getReservationById(reservationGiven.id)
+
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+
+        Assertions.assertEquals(expectedReservation, reservationEntity)
+    }
+
+    @Test
     fun testUpdate() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
@@ -206,6 +241,15 @@ class ReservationTest {
         RestAssured.given()
                 .contentType(ContentType.JSON)
                 .post("/api/reservation/cancel/0")
+                .then()
+                .statusCode(404)
+    }
+
+    @Test
+    fun testAcceptReservationDoesNotExist() {
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .post("/api/reservation/accept/0")
                 .then()
                 .statusCode(404)
     }
@@ -244,32 +288,6 @@ class ReservationTest {
         val badRequestEndDatePassed = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2023, Month.SEPTEMBER, 18, 19, 42, 13), 1)
         RestAssured.given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestEndDatePassed))
-                .post("/api/reservation")
-                .then()
-                .statusCode(400)
-    }
-
-    @Test
-    fun testCreateWithInvalidStatusId1() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
-        val adGiven = createAd(requestAd)
-
-        val badRequestStatusId1 = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 0)
-        RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestStatusId1))
-                .post("/api/reservation")
-                .then()
-                .statusCode(400)
-    }
-
-    @Test
-    fun testCreateWithInvalidStatusId2() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
-        val adGiven = createAd(requestAd)
-
-        val badRequestStatusId2 = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 6)
-        RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestStatusId2))
                 .post("/api/reservation")
                 .then()
                 .statusCode(400)
@@ -328,38 +346,6 @@ class ReservationTest {
         val badRequestEndDatePassed = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2023, Month.SEPTEMBER, 18, 19, 42, 13), 1)
         RestAssured.given().contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestEndDatePassed))
-                .put("/api/reservation/${reservationGiven.id}")
-                .then()
-                .statusCode(400)
-    }
-
-    @Test
-    fun testUpdateWithInvalidStatusId1() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
-        val adGiven = createAd(requestAd)
-
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
-        val reservationGiven = createReservation(requestReservation)
-
-        val badRequestStatusId1 = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 0)
-        RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestStatusId1))
-                .put("/api/reservation/${reservationGiven.id}")
-                .then()
-                .statusCode(400)
-    }
-
-    @Test
-    fun testUpdateWithInvalidStatusId2() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
-        val adGiven = createAd(requestAd)
-
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
-        val reservationGiven = createReservation(requestReservation)
-
-        val badRequestStatusId2 = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 6)
-        RestAssured.given().contentType(ContentType.JSON)
-                .body(Json.encodeToString(badRequestStatusId2))
                 .put("/api/reservation/${reservationGiven.id}")
                 .then()
                 .statusCode(400)

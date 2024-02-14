@@ -32,6 +32,9 @@ class ReservationResource {
     lateinit var deleteUseCase: DeleteUseCase
 
     @Inject
+    lateinit var acceptUseCase: AcceptUseCase
+
+    @Inject
     lateinit var cancelUseCase: CancelUseCase
 
     @Inject
@@ -58,9 +61,9 @@ class ReservationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     fun create(reservationDTO: ReservationDTO): Response {
-        val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
+        val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, 2)
 
-        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now()) || reservationDTO.statusId < 1 || reservationDTO.statusId > 3 || getAdbyIdUseCase.execute(reservationDTO.adId) == null) {
+        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now()) || getAdbyIdUseCase.execute(reservationDTO.adId) == null) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
 
@@ -92,10 +95,19 @@ class ReservationResource {
     fun update(@PathParam("id") reservationId: Int, reservationDTO: ReservationDTO): Response {
         val reservation = Reservation(null, reservationDTO.adId, reservationDTO.userId, reservationDTO.beginDate, reservationDTO.endDate, reservationDTO.statusId)
 
-        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now()) || reservationDTO.statusId < 1 || reservationDTO.statusId > 3) {
+        if (reservationDTO.endDate.isBefore(reservationDTO.beginDate) || reservationDTO.beginDate.isBefore(LocalDateTime.now()) || reservationDTO.endDate.isBefore(LocalDateTime.now())) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
         return updateUseCase.execute(reservationId, reservation)
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Transactional
+    @Path("/accept/{id}")
+    fun accept(@PathParam("id") reservationId: Int): Response {
+        return acceptUseCase.execute(reservationId)
     }
 
     @POST
