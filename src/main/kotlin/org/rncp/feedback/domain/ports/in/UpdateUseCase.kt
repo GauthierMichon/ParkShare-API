@@ -16,7 +16,7 @@ class UpdateUseCase {
     fun execute(feedbackId: Int, feedbackData: Feedback): Response {
         val feedback = feedbackRepository.getById(feedbackId)
         return if (feedback != null) {
-            feedbackRepository.update(feedbackId, feedbackData)
+            feedbackRepository.update(feedbackData)
             Response.status(Response.Status.NO_CONTENT).build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()

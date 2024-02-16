@@ -75,7 +75,7 @@ class FeedbackTest {
 
     @Test
     fun testCreateAndGetById() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -90,7 +90,7 @@ class FeedbackTest {
 
     @Test
     fun testDelete() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -107,7 +107,7 @@ class FeedbackTest {
 
     @Test
     fun testUpdate() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -135,7 +135,7 @@ class FeedbackTest {
 
     @Test
     fun testCreateWithInvalidRating1() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val badRequestRating1 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 0, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -148,7 +148,7 @@ class FeedbackTest {
 
     @Test
     fun testCreateWithInvalidRating2() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val badRequestRating2 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 7, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -170,7 +170,7 @@ class FeedbackTest {
     }
     @Test
     fun testUpdateWithInvalidRating1() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
@@ -186,7 +186,7 @@ class FeedbackTest {
 
     @Test
     fun testUpdateWithInvalidRating2() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))

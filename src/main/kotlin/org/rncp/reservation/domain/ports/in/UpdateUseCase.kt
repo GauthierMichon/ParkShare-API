@@ -14,7 +14,7 @@ class UpdateUseCase {
     fun execute(reservationId: Int, reservationData: Reservation): Response {
         val reservation = reservationRepository.getById(reservationId)
         return if (reservation != null) {
-            reservationRepository.update(reservationId, reservationData)
+            reservationRepository.update(reservationData)
             Response.status(Response.Status.NO_CONTENT).build()
         } else {
             Response.status(Response.Status.NOT_FOUND).build()

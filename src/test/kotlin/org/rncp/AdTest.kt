@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
+import org.rncp.feedback.infra.api.FeedbackCreateOrUpdateDTO
 import org.rncp.reservation.infra.api.ReservationCreateOrUpdateDTO
 import org.rncp.feedback.infra.api.FeedbackDTO
 import org.rncp.reservation.infra.api.ReservationDTO
@@ -31,18 +32,18 @@ class AdTest {
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
     @BeforeEach
     fun generateTokenJwt() {
-        val response = given()
+        val response = RestAssured.given()
                 .contentType(ContentType.JSON)
-    }
-        tokenJWT = token
-                .getString("idToken")
-
-                .extract()
-                .jsonPath()
-        val token = response.then()
-
                 .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
                 .post("/api/user/authentication")
+
+        val token = response.then()
+                .extract()
+                .jsonPath()
+                .getString("idToken")
+
+        tokenJWT = token
+    }
 
     @Transactional
     fun clearReservations() {
@@ -76,8 +77,8 @@ class AdTest {
                 .`as`(AdDto::class.java)
     }
 
-    private fun createReservation(requestReservation: ReservationDTO): ReservationDTO {
-        return RestAssured.given().contentType(ContentType.JSON)
+    private fun createReservation(requestReservation: ReservationCreateOrUpdateDTO): ReservationDTO {
+        return RestAssured.given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestReservation))
                 .post("/api/reservation")
                 .then()
@@ -86,8 +87,8 @@ class AdTest {
                 .`as`(ReservationDTO::class.java)
     }
 
-    private fun createFeedback(requestFeedback: FeedbackDTO): FeedbackDTO {
-        return RestAssured.given().contentType(ContentType.JSON)
+    private fun createFeedback(requestFeedback: FeedbackCreateOrUpdateDTO): FeedbackDTO {
+        return RestAssured.given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestFeedback))
                 .post("/api/feedback")
                 .then()
@@ -113,11 +114,11 @@ class AdTest {
     @Test
     fun testCreateAndGetById() {
         clearAds()
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
         val adEntity = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "xau0If5kFubYSQBOG5y6I6vpMK73", "Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val expectedAd = AdDto(adGiven.id, "xau0If5kFubYSQBOG5y6I6vpMK73", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         assertEquals(expectedAd, adEntity)
     }
@@ -126,7 +127,7 @@ class AdTest {
     fun testDelete() {
         clearAds()
 
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         val adGiven = createAd(requestAd)
         deleteAd(adGiven.id)
@@ -146,7 +147,7 @@ class AdTest {
     fun testGetAll() {
         clearAds()
 
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         createAd(requestAd)
         createAd(requestAd)
@@ -166,17 +167,17 @@ class AdTest {
     fun testGetAllWithLocationFilter() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
-        val requestAd2 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8466, 2.3322, true, "")
-        val requestAd3 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4889, true, "")
-        val requestAd4 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4888, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd2 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8466, 2.3322, true, "")
+        val requestAd3 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4889, true, "")
+        val requestAd4 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8566, 2.4888, true, "")
 
         createAd(requestAd)
         createAd(requestAd2)
         createAd(requestAd3)
         createAd(requestAd4)
 
-        val adsEntity = given().get("/api/ads?latitude=48.8566&longitude=2.3522&distance=10.0")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?latitude=48.8566&longitude=2.3522&distance=10.0")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -191,13 +192,13 @@ class AdTest {
     fun testGetAllWithDateFilterTrue() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
         createReservation(requestReservation)
 
-        val adsEntity = given().get("/api/ads?beginDate=2024-09-19T09:00:00&endDate=2024-09-19T10:00:00")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?beginDate=2024-09-19T09:00:00&endDate=2024-09-19T10:00:00")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -212,13 +213,13 @@ class AdTest {
     fun testGetAllWithDateFilterFalse() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
         createReservation(requestReservation)
 
-        val adsEntity = given().get("/api/ads?beginDate=2024-09-20T09:00:00&endDate=2024-09-21T10:00:00")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?beginDate=2024-09-20T09:00:00&endDate=2024-09-21T10:00:00")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -233,18 +234,18 @@ class AdTest {
     fun testGetAllWithRatingFilterTrue() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestFeedbackRating5 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
-        val requestFeedbackRating4 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating5 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating4 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
 
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating4)
 
-        val adsEntity = given().get("/api/ads?minRate=4.7")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?minRate=4.7")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -259,18 +260,18 @@ class AdTest {
     fun testGetAllWithRatingFilterFalse() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestFeedbackRating5 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
-        val requestFeedbackRating4 = FeedbackDTO(null, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating5 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 5, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        val requestFeedbackRating4 = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
 
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating5)
         createFeedback(requestFeedbackRating4)
 
-        val adsEntity = given().get("/api/ads?minRate=4.8")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?minRate=4.8")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -285,18 +286,18 @@ class AdTest {
     fun testGetAllWithMaxHourPrice() {
         clearAds()
 
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
-        val requestAd2 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 16.3, 48.8666, 2.3722, true, "")
-        val requestAd3 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 6.3, 48.8666, 2.3722, true, "")
-        val requestAd4 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 8.9, 48.8666, 2.3722, true, "")
-        val requestAd5 = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 11.3, 48.8666, 2.3722, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAd2 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 16.3, 48.8666, 2.3722, true, "")
+        val requestAd3 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 6.3, 48.8666, 2.3722, true, "")
+        val requestAd4 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 8.9, 48.8666, 2.3722, true, "")
+        val requestAd5 = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 11.3, 48.8666, 2.3722, true, "")
         createAd(requestAd)
         createAd(requestAd2)
         createAd(requestAd3)
         createAd(requestAd4)
         createAd(requestAd5)
 
-        val adsEntity = given().get("/api/ads?maxHourPrice=15.2")
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?maxHourPrice=15.2")
                 .then()
                 .statusCode(200)
                 .extract()
@@ -309,7 +310,7 @@ class AdTest {
 
     @Test
     fun testPublish() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, false, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
         val adGiven = createAd(requestAd)
 
@@ -333,7 +334,7 @@ class AdTest {
 
     @Test
     fun testUnpublish() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
 
         val adGiven = createAd(requestAd)
@@ -359,8 +360,8 @@ class AdTest {
 
     @Test
     fun testUpdate() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
-        val requestAdUpdate = AdCreateOrUpdateDTO("Gauthier Ad Update", "Description de test Update", 25.8f, -0.2569191f, 30.281220f, false, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val requestAdUpdate = AdCreateOrUpdateDTO("Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         val adGiven = createAd(requestAd)
 
@@ -372,14 +373,14 @@ class AdTest {
 
         val adUpdate = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
+        val expectedAd = AdDto(adGiven.id, "xau0If5kFubYSQBOG5y6I6vpMK73", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         assertEquals(expectedAd, adUpdate)
     }
 
     @Test
     fun testDeleteAdWithActiveReservation() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -405,9 +406,9 @@ class AdTest {
 
     @Test
     fun testUpdateAdDoesNotExist() {
-        val requestAdUpdate = AdDto(null, "Testeur", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
+        val requestAdUpdate = AdCreateOrUpdateDTO("Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
-        given().contentType(ContentType.JSON)
+        given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestAdUpdate))
                 .put("/api/ads/0")
                 .then()
@@ -416,7 +417,7 @@ class AdTest {
 
     @Test
     fun testCreateWithNegativeHourPrice() {
-        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", -56.3f, -0.2562456f, 30.295626f, true, "")
+        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", -56.3, -0.2562456, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -426,7 +427,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLatitudeNegative() {
-        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -100.25624f, 30.295626f, true, "")
+        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -100.25624, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -436,7 +437,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLatitudePositive() {
-        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, 100.25624f, 30.295626f, true, "")
+        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 100.25624, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -446,7 +447,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLongitudeNegative() {
-        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, -300.9562f, true, "")
+        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, -300.9562, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -456,7 +457,7 @@ class AdTest {
 
     @Test
     fun testCreateWithInvalidLongitudePositive() {
-        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 300.9562f, true, "")
+        val badRequestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 300.9562, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestAd))
                 .post("/api/ads")
@@ -466,10 +467,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithNegativeHourPrice() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestHourPrice = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", -56.3f, -0.2562456f, 30.295626f, true, "")
+        val badRequestHourPrice = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", -56.3, -0.2562456, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestHourPrice))
                 .put("/api/ads/${adGiven.id}")
@@ -479,10 +480,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLatitudeNegative() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLatitudeNegative = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -100.25624f, 30.295626f, true, "")
+        val badRequestLatitudeNegative = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -100.25624, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLatitudeNegative))
                 .put("/api/ads/${adGiven.id}")
@@ -492,10 +493,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLatitudePositive() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLatitudePositive = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, 100.25624f, 30.295626f, true, "")
+        val badRequestLatitudePositive = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 100.25624, 30.295626, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLatitudePositive))
                 .put("/api/ads/${adGiven.id}")
@@ -505,10 +506,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLongitudeNegative() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLongitudeNegative = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, -300.9562f, true, "")
+        val badRequestLongitudeNegative = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, -300.9562, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLongitudeNegative))
                 .put("/api/ads/${adGiven.id}")
@@ -518,10 +519,10 @@ class AdTest {
 
     @Test
     fun testUpdateWithInvalidLongitudePositive() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val badRequestLongitudePositive = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 300.9562f, true, "")
+        val badRequestLongitudePositive = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 300.9562, true, "")
         given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(badRequestLongitudePositive))
                 .put("/api/ads/${adGiven.id}")
@@ -533,7 +534,7 @@ class AdTest {
     fun testPublishAdDoesNotExist() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
-        given().contentType(ContentType.JSON)
+        given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(requestAd)
                 .post("/api/ads/0/publish")
                 .then()
@@ -544,7 +545,7 @@ class AdTest {
     fun testUnpublishAdDoesNotExist() {
         val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, false, "")
 
-        given().contentType(ContentType.JSON)
+        given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(requestAd)
                 .post("/api/ads/0/unpublish")
                 .then()

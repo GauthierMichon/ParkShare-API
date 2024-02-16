@@ -116,6 +116,7 @@ class ReservationResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @Path("/accept/{id}")
+    @Authenticated
     fun accept(@PathParam("id") reservationId: Int): Response {
         return acceptUseCase.execute(reservationId)
     }

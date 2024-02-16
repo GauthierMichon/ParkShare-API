@@ -8,9 +8,9 @@ import org.rncp.ad.domain.model.Ad
 class AdCreateOrUpdateDTO(
         val name: String,
         val description: String,
-        val hourPrice: Float,
-        val latitude: Float,
-        val longitude: Float,
+        val hourPrice: Double,
+        val latitude: Double,
+        val longitude: Double,
         val state: Boolean,
         val link: String
 ) {

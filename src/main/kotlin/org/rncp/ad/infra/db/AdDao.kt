@@ -21,7 +21,7 @@ data class AdDao(
         var longitude: Double,
         var state: Boolean,
 ) : PanacheEntityBase() {
-    constructor() : this(0, UserDAO(), "", "", 0.0f, 0.0f, 0.0f, false)
+    constructor() : this(0, UserDAO(), "", "", 0.0, 0.0, 0.0, false)
 
     fun toAd(): Ad {
         return Ad(id, user.uid, name, description, hourPrice, latitude, longitude, state)

@@ -34,8 +34,8 @@ class ReservationTest {
                 .contentType(ContentType.JSON)
                 .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
                 .post("/api/user/authentication")
-        val token = response.then()
 
+        val token = response.then()
                 .extract()
                 .jsonPath()
                 .getString("idToken")
@@ -89,10 +89,10 @@ class ReservationTest {
 
     @Test
     fun testCreateAndGetById() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
         val reservationGiven = createReservation(requestReservation)
 
         val reservationEntity = getReservationById(reservationGiven.id)
@@ -105,7 +105,7 @@ class ReservationTest {
     @Test
     fun testGetByStatus() {
         clearReservations()
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
         val adGiven2 = createAd(requestAd)
         val adGiven3 = createAd(requestAd)
@@ -117,13 +117,14 @@ class ReservationTest {
         for (i in 0..20) {
             val randomAdIdIndex = Random.nextInt(0, 3)
             val randomStatus = Random.nextInt(1, 4)
-            val requestReservation = ReservationDTO(null, adIdsList[randomAdIdIndex], adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), randomStatus)
+            val requestReservation = ReservationCreateOrUpdateDTO(adIdsList[randomAdIdIndex], LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), randomStatus)
             val reservationGiven = createReservation(requestReservation)
 
             when (randomStatus) {
                 1 -> {
                     countStatus1++
                     RestAssured.given()
+                            .auth().oauth2(tokenJWT)
                             .contentType(ContentType.JSON)
                             .post("/api/reservation/accept/${reservationGiven.id}")
                             .then()
@@ -133,6 +134,7 @@ class ReservationTest {
                 3 -> {
                     countStatus3++
                     RestAssured.given()
+                            .auth().oauth2(tokenJWT)
                             .contentType(ContentType.JSON)
                             .post("/api/reservation/cancel/${reservationGiven.id}")
                             .then()
@@ -172,7 +174,7 @@ class ReservationTest {
 
     @Test
     fun testDelete() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -189,7 +191,7 @@ class ReservationTest {
 
     @Test
     fun testCancel() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -211,13 +213,14 @@ class ReservationTest {
 
     @Test
     fun testAccept() {
-        val requestAd = AdDto(null, "Testeur", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationDTO(null, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
         val reservationGiven = createReservation(requestReservation)
 
         RestAssured.given()
+                .auth().oauth2(tokenJWT)
                 .contentType(ContentType.JSON)
                 .post("/api/reservation/accept/${reservationGiven.id}")
                 .then()
@@ -232,10 +235,10 @@ class ReservationTest {
 
     @Test
     fun testUpdate() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
-        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
         val requestReservationUpdate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 21, 19, 42, 13), 2)
         val reservationGiven = createReservation(requestReservation)
 
@@ -271,6 +274,7 @@ class ReservationTest {
     @Test
     fun testAcceptReservationDoesNotExist() {
         RestAssured.given()
+                .auth().oauth2(tokenJWT)
                 .contentType(ContentType.JSON)
                 .post("/api/reservation/accept/0")
                 .then()
@@ -279,7 +283,7 @@ class ReservationTest {
 
     @Test
     fun testCreateWithEndDateBeforeBeginDate() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val badRequestEndDateBeforeBeginDate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 18, 19, 42, 13), 1)
@@ -292,7 +296,7 @@ class ReservationTest {
 
     @Test
     fun testCreateWithBeginDatePassed() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val badRequestBeginDatePassed = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 18, 19, 42, 13), 1)
@@ -305,7 +309,7 @@ class ReservationTest {
 
     @Test
     fun testCreateWithEndDatePassed() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val badRequestEndDatePassed = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2023, Month.SEPTEMBER, 18, 19, 42, 13), 1)
@@ -328,7 +332,7 @@ class ReservationTest {
 
     @Test
     fun testUpdateWithEndDateBeforeBeginDate() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -344,7 +348,7 @@ class ReservationTest {
 
     @Test
     fun testUpdateWithBeginDatePassed() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
@@ -360,7 +364,7 @@ class ReservationTest {
 
     @Test
     fun testUpdateWithEndDatePassed() {
-        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3f, -0.2562456f, 30.295626f, true, "")
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)

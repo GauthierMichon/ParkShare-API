@@ -40,7 +40,7 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return adDao.toAd()
     }
 
-    override fun update(ad: Ad): Ad {
+    override fun update(ad: Ad) {
         val adDao = findById(ad.id)
         adDao.apply {
             name = ad.name
