@@ -1,10 +1,13 @@
 package org.rncp.feedback.infra.api
 
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
+import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.core.SecurityContext
 import org.rncp.ad.domain.ports.`in`.GetAdByIdUseCase
 import org.rncp.ad.infra.api.AdDto
 import org.rncp.feedback.domain.model.Feedback
@@ -49,11 +52,13 @@ class FeedbackResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun create(feedbackDTO: FeedbackDTO): Response {
-        val feedback = Feedback(null, feedbackDTO.adId, feedbackDTO.userId, feedbackDTO.rating, feedbackDTO.description, feedbackDTO.date)
+    @Authenticated
+    fun create(feedbackCreateOrUpdateDTO: FeedbackCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val feedback = Feedback(null, feedbackCreateOrUpdateDTO.adId, userUid, feedbackCreateOrUpdateDTO.rating, feedbackCreateOrUpdateDTO.description, feedbackCreateOrUpdateDTO.date)
 
-        feedbackDTO.rating?.let { rating ->
-            if (rating < 1 || rating > 5 || getAdbyIdUseCase.execute(feedbackDTO.adId) == null) {
+        feedbackCreateOrUpdateDTO.rating?.let { rating ->
+            if (rating < 1 || rating > 5 || getAdbyIdUseCase.execute(feedbackCreateOrUpdateDTO.adId) == null) {
                 return Response.status(Response.Status.BAD_REQUEST).build()
             }
         }
@@ -76,9 +81,10 @@ class FeedbackResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     @Transactional
-    fun update(@PathParam("id") feedbackId: Int, feedbackDTO: FeedbackDTO): Response {
-        val feedback = Feedback(null, feedbackDTO.adId, feedbackDTO.userId, feedbackDTO.rating, feedbackDTO.description, feedbackDTO.date)
-        feedbackDTO.rating?.let { rating ->
+    fun update(@PathParam("id") feedbackId: Int, feedbackCreateOrUpdateDTO: FeedbackCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val feedback = Feedback(feedbackId, feedbackCreateOrUpdateDTO.adId, userUid, feedbackCreateOrUpdateDTO.rating, feedbackCreateOrUpdateDTO.description, feedbackCreateOrUpdateDTO.date)
+        feedbackCreateOrUpdateDTO.rating?.let { rating ->
             if (rating < 1 || rating > 5) {
                 return Response.status(Response.Status.BAD_REQUEST).build()
             }

@@ -1,10 +1,13 @@
 package org.rncp.ad.infra.api
 
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
 import jakarta.ws.rs.*
+import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.core.SecurityContext
 import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.model.SortField
 import org.rncp.ad.domain.model.SortType
@@ -36,6 +39,7 @@ class AdResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Authenticated
     fun getAll(
             @QueryParam("latitude") latitude: Double?,
             @QueryParam("longitude") longitude: Double?,
@@ -57,6 +61,7 @@ class AdResource {
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Authenticated
     fun getById(@PathParam("id") adId: Int): Response {
         val ad = getOneUseCase.execute(adId)
 
@@ -71,9 +76,11 @@ class AdResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun create(adDto: AdDto): Response {
-        val ad = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
-        if (adDto.hourPrice < 0f || adDto.latitude < -90 || adDto.latitude > 90 || adDto.longitude < -180 || adDto.longitude > 180) {
+    @Authenticated
+    fun create(adCreateOrUpdateDTO: AdCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val ad = Ad(null, userUid, adCreateOrUpdateDTO.name, adCreateOrUpdateDTO.description, adCreateOrUpdateDTO.hourPrice, adCreateOrUpdateDTO.latitude, adCreateOrUpdateDTO.longitude, adCreateOrUpdateDTO.state)
+        if (adCreateOrUpdateDTO.hourPrice < 0f || adCreateOrUpdateDTO.latitude < -90 || adCreateOrUpdateDTO.latitude > 90 || adCreateOrUpdateDTO.longitude < -180 || adCreateOrUpdateDTO.longitude > 180) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
 
@@ -85,9 +92,11 @@ class AdResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    fun update(@PathParam("id") adId: Int, adDto: AdDto): Response {
-        val adData = Ad(null, adDto.userId, adDto.name, adDto.description, adDto.hourPrice, adDto.latitude, adDto.longitude, adDto.state)
-        if (adDto.hourPrice < 0f || adDto.latitude < -90 || adDto.latitude > 90 || adDto.longitude < -180 || adDto.longitude > 180) {
+    @Authenticated
+    fun update(@PathParam("id") adId: Int, adCreateOrUpdateDTO: AdCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
+        val userUid = securityContext.userPrincipal.name
+        val adData = Ad(adId, userUid, adCreateOrUpdateDTO.name, adCreateOrUpdateDTO.description, adCreateOrUpdateDTO.hourPrice, adCreateOrUpdateDTO.latitude, adCreateOrUpdateDTO.longitude, adCreateOrUpdateDTO.state)
+        if (adCreateOrUpdateDTO.hourPrice < 0f || adCreateOrUpdateDTO.latitude < -90 || adCreateOrUpdateDTO.latitude > 90 || adCreateOrUpdateDTO.longitude < -180 || adCreateOrUpdateDTO.longitude > 180) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
         return updateUseCase.execute(adId, adData)
@@ -97,6 +106,7 @@ class AdResource {
     @Path("/{id}/publish")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Authenticated
     fun publish(@PathParam("id") adId: Int): Response {
         return publishUseCase.execute(adId)
     }
@@ -105,6 +115,7 @@ class AdResource {
     @Path("/{id}/unpublish")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
+    @Authenticated
     fun unpublish(@PathParam("id") adId: Int): Response {
         return unpublishUseCase.execute(adId)
     }
@@ -112,6 +123,7 @@ class AdResource {
     @DELETE
     @Transactional
     @Path("/{id}")
+    @Authenticated
     fun delete(@PathParam("id") adId: Int): Response {
         val isDeleted = deleteUseCase.execute(adId)
         return if (isDeleted) {

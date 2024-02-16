@@ -8,16 +8,22 @@ import org.rncp.feedback.domain.model.Feedback
 import org.rncp.feedback.domain.ports.out.FeedbackRepository
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.out.ReservationRepository
+import org.rncp.user.infra.db.UserDAO
+import org.rncp.user.infra.db.UserPostGreRepository
 
 @ApplicationScoped
 class FeedbackPostGreRepository : PanacheRepositoryBase<FeedbackDAO, Int> , FeedbackRepository {
 
     @Inject
-    lateinit var adRepository: AdPostGreRepository
+    private lateinit var adRepository: AdPostGreRepository
+
+    @Inject
+    private lateinit var userRepository: UserPostGreRepository
 
     override fun create(feedback: Feedback): Feedback {
         val ad = adRepository.findById(feedback.adId)
-        val feedbackDAO = FeedbackDAO(null, ad, feedback.userId, feedback.rating, feedback.description, feedback.date)
+        val user = userRepository.find("uid", feedback.userId).firstResult<UserDAO>()
+        val feedbackDAO = FeedbackDAO(null, ad, user, feedback.rating, feedback.description, feedback.date)
         persistAndFlush(feedbackDAO)
         return feedbackDAO.toFeedback()
     }
@@ -28,11 +34,11 @@ class FeedbackPostGreRepository : PanacheRepositoryBase<FeedbackDAO, Int> , Feed
     override fun getListByAd(adId: Int): List<Feedback> {
         return list("ad.id", adId).map { it.toFeedback() }
     }
-    override fun update(feedbackId: Int, feedback: Feedback) {
-        val feedbackToUpdate = findById(feedbackId)
+    override fun update(feedback: Feedback) {
+        val feedbackToUpdate = findById(feedback.id)
         feedbackToUpdate.apply {
             ad = adRepository.findById(feedback.adId)
-            userId = feedback.userId
+            user = userRepository.find("uid", feedback.userId).firstResult()
             rating = feedback.rating
             description = feedback.description
             date = feedback.date

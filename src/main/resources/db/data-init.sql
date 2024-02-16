@@ -1,23 +1,22 @@
 INSERT INTO status (label) VALUES
-    ('Confirmé'),
-    ('En attente'),
-    ('Annulé');
+('Confirmé'),
+('En attente'),
+('Annulé');
 
+INSERT INTO app_user (uid, firstname, lastname, email, roleId) VALUES
+('xau0If5kFubYSQBOG5y6I6vpMK73', 'hugo', 'barbaste', 'hugobast33@gmail.com', 2);
 
 INSERT INTO ad (hourprice, state, description, latitude, longitude, name, userId) VALUES
-(2.0, true, 'coucou', 48.8666, 2.3722, 'test', 'fdfvreferg'),
-(4.0, true, 'coucou2', 48.8566, 2.3522, 'test2', 'fdfvreferg'),
-(8.0, true, 'coucou3', 48.8466, 2.3322, 'test3', 'fdfvreferg'),
-(16.0, true, 'coucou4', 48.8566, 2.4889, 'test4', 'fdfvreferg'),
-(14.7, true, 'coucou5', 48.8566, 2.4888, 'test5', 'fdfvreferg');
+(2.0, true, 'coucou', 2.01285895, -2.095629599, 'test', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(2.0, true, 'coucou2', 2.01285895, -2.095629599, 'test2', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(2.0, true, 'coucou3', 2.01285895, -2.095629599, 'test3', 'xau0If5kFubYSQBOG5y6I6vpMK73');
 
 INSERT INTO reservation (ad, status, beginDate, endDate, userId) VALUES
-    (1, 2, '2024-06-12', '2024-06-16', 'vbggtrgrr'),
-    (1, 2, '2024-06-18', '2024-06-22', 'vbggtrgrr'),
-    (1, 2, '2024-07-12', '2024-07-16', 'vbggtrgrr');
+(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73');
 
 INSERT INTO feedback (ad, rating, description, date, userId) VALUES
-(1, 5, 'coucou', '2023-10-04', 'fegfegegtger'),
-(1, 5, 'coucou2', '2023-10-04', 'fegfegegtger'),
-(1, 5, 'coucou3', '2023-10-04', 'fegfegegtger'),
-(1, 4, 'coucou4', '2023-10-04', 'fegfegegtger');
+(1, 5, 'coucou', '2023-10-04', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 5, 'coucou2', '2023-10-04', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 5, 'coucou3', '2023-10-04', 'xau0If5kFubYSQBOG5y6I6vpMK73');

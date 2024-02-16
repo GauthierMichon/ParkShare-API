@@ -11,7 +11,7 @@ import org.rncp.reservation.domain.ports.out.ReservationRepository
 @ApplicationScoped
 class UpdateUseCase {
     @Inject
-    lateinit var feedbackRepository: FeedbackRepository
+    private lateinit var feedbackRepository: FeedbackRepository
 
     fun execute(feedbackId: Int, feedbackData: Feedback): Response {
         val feedback = feedbackRepository.getById(feedbackId)

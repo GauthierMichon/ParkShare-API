@@ -9,6 +9,8 @@ import org.rncp.feedback.domain.model.Feedback
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.out.ReservationRepository
 import org.rncp.status.infra.db.StatusPostGreRepository
+import org.rncp.user.infra.db.UserDAO
+import org.rncp.user.infra.db.UserPostGreRepository
 
 @ApplicationScoped
 class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> , ReservationRepository {
@@ -19,10 +21,14 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     @Inject
     private lateinit var statusRepository: StatusPostGreRepository
 
+    @Inject
+    private lateinit var userRepository: UserPostGreRepository
+
     override fun create(reservation: Reservation): Reservation {
         val ad = adRepository.findById(reservation.adId)
         val status = statusRepository.findById(reservation.statusId)
-        val reservationDAO = ReservationDAO(null, ad, reservation.userId, reservation.beginDate, reservation.endDate, status)
+        val user = userRepository.find("uid", reservation.userId).firstResult<UserDAO>()
+        val reservationDAO = ReservationDAO(null, ad, user, reservation.beginDate, reservation.endDate, status)
         persistAndFlush(reservationDAO)
         return reservationDAO.toReservation()
     }
@@ -58,11 +64,11 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     override fun delete(id: Int) {
         deleteById(id)
     }
-    override fun update(reservationId: Int, reservation: Reservation) {
-        val reservationToUpdate = findById(reservationId)
+    override fun update(reservation: Reservation) {
+        val reservationToUpdate = findById(reservation.id)
         reservationToUpdate.apply {
-            ad = reservationToUpdate.ad
-            userId = reservationToUpdate.userId
+            ad = adRepository.findById(reservation.adId)
+            user = userRepository.find("uid", reservation.userId).firstResult()
             beginDate = reservation.beginDate
             endDate = reservation.endDate
             status = reservationToUpdate.status

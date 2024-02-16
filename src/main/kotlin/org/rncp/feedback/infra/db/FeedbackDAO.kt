@@ -4,6 +4,7 @@ import io.quarkus.hibernate.orm.panache.PanacheEntityBase
 import jakarta.persistence.*
 import org.rncp.ad.infra.db.AdDao
 import org.rncp.feedback.domain.model.Feedback
+import org.rncp.user.infra.db.UserDAO
 import java.time.LocalDateTime
 
 @Entity
@@ -14,14 +15,16 @@ data class FeedbackDAO(
         @ManyToOne(targetEntity = AdDao::class, fetch = FetchType.LAZY)
         @JoinColumn(name="ad")
         var ad: AdDao,
-        var userId: String,
+        @ManyToOne(targetEntity = UserDAO::class, fetch = FetchType.LAZY)
+        @JoinColumn(name="userId")
+        var user: UserDAO,
         var rating: Int?,
         var description: String,
         var date: LocalDateTime,
 ) : PanacheEntityBase() {
-    constructor() : this(0, AdDao(), "", null, "", LocalDateTime.now())
+    constructor() : this(0, AdDao(), UserDAO(), null, "", LocalDateTime.now())
 
     fun toFeedback(): Feedback {
-        return Feedback(id, ad.id!!, userId, rating, description, date)
+        return Feedback(id, ad.id!!, user.uid, rating, description, date)
     }
 }

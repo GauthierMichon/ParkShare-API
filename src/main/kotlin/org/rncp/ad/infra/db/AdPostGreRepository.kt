@@ -9,6 +9,8 @@ import org.rncp.feedback.infra.db.FeedbackPostGreRepository
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
 import org.rncp.reservation.domain.ports.out.ReservationRepository
+import org.rncp.user.infra.db.UserDAO
+import org.rncp.user.infra.db.UserPostGreRepository
 
 @ApplicationScoped
 class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
@@ -19,8 +21,12 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
+    @Inject
+    private lateinit var userRepository: UserPostGreRepository
+
     override fun create(ad: Ad): Ad {
-        val adDao = AdDao(null, ad.userId, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
+        val user = userRepository.find("uid", ad.userId).firstResult<UserDAO>()
+        val adDao = AdDao(null, user, ad.name, ad.description, ad.hourPrice, ad.latitude, ad.longitude, ad.state)
         persist(adDao)
         return adDao.toAd()
     }
@@ -34,16 +40,16 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return adDao.toAd()
     }
 
-    override fun update(adId: Int, adData: Ad) {
-        val adDao = findById(adId)
-
+    override fun update(ad: Ad): Ad {
+        val adDao = findById(ad.id)
         adDao.apply {
-            name = adData.name
-            description = adData.description
-            hourPrice = adData.hourPrice
-            latitude = adData.latitude
-            longitude = adData.longitude
-            state = adData.state
+            name = ad.name
+            user = userRepository.find("uid", ad.userId).firstResult()
+            description = ad.description
+            hourPrice = ad.hourPrice
+            latitude = ad.latitude
+            longitude = ad.longitude
+            state = ad.state
         }
         persistAndFlush(adDao)
     }

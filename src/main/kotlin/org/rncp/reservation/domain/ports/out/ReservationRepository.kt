@@ -12,5 +12,5 @@ interface ReservationRepository {
     fun accept(reservation: Reservation)
     fun cancel(reservation: Reservation)
     fun delete(id: Int)
-    fun update(reservationId: Int, reservation: Reservation)
+    fun update(reservation: Reservation)
 }
