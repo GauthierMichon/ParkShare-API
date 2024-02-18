@@ -31,7 +31,7 @@ class AdTest {
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
     @BeforeEach
     fun generateTokenJwt() {
-        val response = RestAssured.given()
+        val response = given()
                 .contentType(ContentType.JSON)
                 .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
                 .post("/api/user/authentication")
@@ -250,6 +250,27 @@ class AdTest {
                 .getList(".", AdDto::class.java)
 
         assertEquals(0, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithDateTrue2() {
+        clearAds()
+
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 3)
+        createReservation(requestReservation)
+
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?beginDate=2024-09-20T09:00:00&endDate=2024-09-21T10:00:00")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(1, adsEntity.size)
     }
 
     @Test

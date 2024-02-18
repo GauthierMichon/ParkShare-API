@@ -118,17 +118,19 @@ class GetAllUseCase {
 
         // Vérifier si une réservation chevauche la période spécifiée
         if (reservations != null) {
-            if (reservations.any { reservation ->
+            val validReservations = reservations.filter { it.statusId != 3 }
+
+            if (validReservations.any { reservation ->
                         reservation.endDate.isAfter(beginDate) && reservation.beginDate.isBefore(endDate)
                     }) {
-                // Il y a une réservation qui chevauche la période spécifiée
+                // Il y a une réservation valide qui chevauche la période spécifiée
                 return false
             }
 
-            if (reservations.any { reservation ->
+            if (validReservations.any { reservation ->
                         endDate.isAfter(reservation.beginDate) && beginDate.isBefore(reservation.endDate)
                     }) {
-                // La période spécifiée chevauche une réservation existante
+                // La période spécifiée chevauche une réservation valide existante
                 return false
             }
         }
