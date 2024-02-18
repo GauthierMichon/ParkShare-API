@@ -72,6 +72,7 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
     }
     override fun update(reservation: Reservation) {
         val reservationToUpdate = findById(reservation.id)
+        val status2 = statusRepository.findById(reservation.statusId)
         reservationToUpdate.apply {
             ad = adRepository.findById(reservation.adId)
             user = userRepository.find("uid", reservation.userId).firstResult()
@@ -80,7 +81,7 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
             val timeReservation = Duration.between(beginDate, endDate).toMinutes() / 60.0
             val timeReservationRound = "%.2f".format(timeReservation).replace(",", ".").toDouble()
             totalPrice = ad.hourPrice * timeReservationRound
-            status = reservationToUpdate.status
+            status = status2
         }
         persistAndFlush(reservationToUpdate)
     }

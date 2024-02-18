@@ -240,8 +240,14 @@ class ReservationTest {
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
-        val requestReservationUpdate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 19, 20, 42, 13), 2)
+        val requestReservationUpdate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 19, 20, 42, 13), 1)
         val reservationGiven = createReservation(requestReservation)
+
+        given().auth().oauth2(tokenJWT)
+                .contentType(ContentType.JSON)
+                .post("/api/reservation/cancel/${reservationGiven.id}")
+                .then()
+                .statusCode(200)
 
         RestAssured.given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestReservationUpdate))
