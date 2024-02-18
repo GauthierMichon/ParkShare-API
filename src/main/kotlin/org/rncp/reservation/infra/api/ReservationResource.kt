@@ -64,9 +64,9 @@ class ReservationResource {
     @Authenticated
     fun create(reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
         val userUid = securityContext.userPrincipal.name
-        val reservation = Reservation(null, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, null, reservationCreateOrUpdateDTO.statusId)
+        val reservation = Reservation(null, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, null, 2)
 
-        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3 || getAdbyIdUseCase.execute(reservationCreateOrUpdateDTO.adId) == null) {
+        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || getAdbyIdUseCase.execute(reservationCreateOrUpdateDTO.adId) == null) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
 
@@ -100,9 +100,9 @@ class ReservationResource {
     @Authenticated
     fun update(@PathParam("id") reservationId: Int, reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
         val userUid = securityContext.userPrincipal.name
-        val reservation = Reservation(reservationId, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, 0.0, reservationCreateOrUpdateDTO.statusId)
+        val reservation = Reservation(reservationId, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, 0.0, 2)
 
-        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3) {
+        if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now())) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
         return updateUseCase.execute(reservationId, reservation)
