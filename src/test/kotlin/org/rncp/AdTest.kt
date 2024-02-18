@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 import org.rncp.ad.infra.api.AdDto
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
 import org.rncp.feedback.infra.api.FeedbackCreateOrUpdateDTO
@@ -161,6 +160,29 @@ class AdTest {
                 .getList(".", AdDto::class.java)
 
         assertEquals(2, adsEntity.size)
+    }
+
+    @Test
+    fun testGetAllWithPublishFilter() {
+        clearAds()
+
+        val requestAdPublished = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8666, 2.3722, true, "")
+        val requestAdUnpublished = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, 48.8466, 2.3322, false, "")
+
+        createAd(requestAdPublished)
+        createAd(requestAdUnpublished)
+        createAd(requestAdPublished)
+        createAd(requestAdPublished)
+
+        val adsEntity = given().auth().oauth2(tokenJWT).get("/api/ads?onlyPublish=true")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", AdDto::class.java)
+
+        assertEquals(3, adsEntity.size)
     }
 
     @Test

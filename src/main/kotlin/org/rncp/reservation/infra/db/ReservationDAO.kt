@@ -21,13 +21,14 @@ data class ReservationDAO(
         var user: UserDAO,
         var beginDate: LocalDateTime,
         var endDate: LocalDateTime,
+        var totalPrice: Double,
         @ManyToOne(targetEntity = StatusDAO::class, fetch = FetchType.LAZY)
         @JoinColumn(name="status")
         var status: StatusDAO,
 ) : PanacheEntityBase() {
-    constructor() : this(0, AdDao(), UserDAO(), LocalDateTime.now(), LocalDateTime.now(), StatusDAO())
+    constructor() : this(0, AdDao(), UserDAO(), LocalDateTime.now(), LocalDateTime.now(), 0.0, StatusDAO())
 
     fun toReservation(): Reservation {
-        return Reservation(id, ad.id!!, user.uid, beginDate, endDate, status.id!!)
+        return Reservation(id, ad.id!!, user.uid, beginDate, endDate, totalPrice, status.id!!)
     }
 }

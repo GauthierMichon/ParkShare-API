@@ -11,10 +11,10 @@ INSERT INTO ad (hourprice, state, description, latitude, longitude, name, userId
 (2.0, true, 'coucou2', 2.01285895, -2.095629599, 'test2', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
 (2.0, true, 'coucou3', 2.01285895, -2.095629599, 'test3', 'xau0If5kFubYSQBOG5y6I6vpMK73');
 
-INSERT INTO reservation (ad, status, beginDate, endDate, userId) VALUES
-(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
-(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73'),
-(1, 1, '2022-06-12', '2022-06-16', 'xau0If5kFubYSQBOG5y6I6vpMK73');
+INSERT INTO reservation (ad, status, beginDate, endDate, totalPrice, userId) VALUES
+(1, 1, '2022-06-12', '2022-06-16', 0.0, 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 1, '2022-06-12', '2022-06-16', 0.0, 'xau0If5kFubYSQBOG5y6I6vpMK73'),
+(1, 1, '2022-06-12', '2022-06-16', 0.0, 'xau0If5kFubYSQBOG5y6I6vpMK73');
 
 INSERT INTO feedback (ad, rating, description, date, userId) VALUES
 (1, 5, 'coucou', '2023-10-04', 'xau0If5kFubYSQBOG5y6I6vpMK73'),

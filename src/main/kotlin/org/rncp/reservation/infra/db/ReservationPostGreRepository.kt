@@ -11,6 +11,10 @@ import org.rncp.reservation.domain.ports.out.ReservationRepository
 import org.rncp.status.infra.db.StatusPostGreRepository
 import org.rncp.user.infra.db.UserDAO
 import org.rncp.user.infra.db.UserPostGreRepository
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDateTime
+import java.time.Duration
 
 @ApplicationScoped
 class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> , ReservationRepository {
@@ -28,7 +32,10 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         val ad = adRepository.findById(reservation.adId)
         val status = statusRepository.findById(reservation.statusId)
         val user = userRepository.find("uid", reservation.userId).firstResult<UserDAO>()
-        val reservationDAO = ReservationDAO(null, ad, user, reservation.beginDate, reservation.endDate, status)
+        val timeReservation = Duration.between(reservation.beginDate, reservation.endDate).toMinutes() / 60.0
+        val totalPrice = BigDecimal(ad.hourPrice * timeReservation).setScale(2, RoundingMode.HALF_EVEN).toDouble()
+
+        val reservationDAO = ReservationDAO(null, ad, user, reservation.beginDate, reservation.endDate, totalPrice, status)
         persistAndFlush(reservationDAO)
         return reservationDAO.toReservation()
     }
@@ -46,7 +53,6 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
 
     override fun accept(reservation: Reservation) {
         val reservationDao = findById(reservation.id)
-
         reservationDao.apply {
             status = statusRepository.findById(1)
         }
@@ -71,6 +77,9 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
             user = userRepository.find("uid", reservation.userId).firstResult()
             beginDate = reservation.beginDate
             endDate = reservation.endDate
+            val timeReservation = Duration.between(beginDate, endDate).toMinutes() / 60.0
+            val timeReservationRound = "%.2f".format(timeReservation).replace(",", ".").toDouble()
+            totalPrice = ad.hourPrice * timeReservationRound
             status = reservationToUpdate.status
         }
         persistAndFlush(reservationToUpdate)

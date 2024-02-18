@@ -14,6 +14,7 @@ data class ReservationDTO(
         var beginDate: LocalDateTime,
         @Serializable(with = LocalDateTimeSerializer::class)
         var endDate: LocalDateTime,
+        var totalPrice: Double,
         var statusId: Int,
 ) {
     companion object {
@@ -24,6 +25,7 @@ data class ReservationDTO(
                     userId = reservation.userId,
                     beginDate = reservation.beginDate,
                     endDate = reservation.endDate,
+                    totalPrice = reservation.totalPrice!!,
                     statusId = reservation.statusId
             )
         }

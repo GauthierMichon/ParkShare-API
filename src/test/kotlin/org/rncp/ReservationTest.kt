@@ -2,6 +2,7 @@ package org.rncp
 
 import io.quarkus.test.junit.QuarkusTest
 import io.restassured.RestAssured
+import io.restassured.RestAssured.given
 import io.restassured.http.ContentType
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
@@ -30,7 +31,7 @@ class ReservationTest {
 
     @BeforeEach
     fun generateTokenJwt() {
-        val response = RestAssured.given()
+        val response = given()
                 .contentType(ContentType.JSON)
                 .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
                 .post("/api/user/authentication")
@@ -50,7 +51,7 @@ class ReservationTest {
     }
 
     private fun createAd(requestAd: AdCreateOrUpdateDTO): AdDto {
-        return RestAssured.given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
+        return given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
                 .body(Json.encodeToString(requestAd))
                 .post("/api/ads")
                 .then()
@@ -97,7 +98,7 @@ class ReservationTest {
 
         val reservationEntity = getReservationById(reservationGiven.id)
 
-        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1351.2, 2)
 
         Assertions.assertEquals(expectedReservation, reservationEntity)
     }
@@ -206,7 +207,7 @@ class ReservationTest {
 
         val reservationEntity = getReservationById(reservationGiven.id)
 
-        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 3)
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1351.2, 3)
 
         Assertions.assertEquals(expectedReservation, reservationEntity)
     }
@@ -228,7 +229,7 @@ class ReservationTest {
 
         val reservationEntity = getReservationById(reservationGiven.id)
 
-        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1)
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1351.2, 1)
 
         Assertions.assertEquals(expectedReservation, reservationEntity)
     }
@@ -239,7 +240,7 @@ class ReservationTest {
         val adGiven = createAd(requestAd)
 
         val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
-        val requestReservationUpdate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 21, 19, 42, 13), 2)
+        val requestReservationUpdate = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 19, 20, 42, 13), 2)
         val reservationGiven = createReservation(requestReservation)
 
         RestAssured.given().auth().oauth2(tokenJWT).contentType(ContentType.JSON)
@@ -249,7 +250,7 @@ class ReservationTest {
                 .statusCode(204)
 
         val reservationUpdate = getReservationById(reservationGiven.id)
-        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 21, 19, 42, 13), 2)
+        val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 19, 20, 42, 13), 56.3, 2)
 
         Assertions.assertEquals(expectedReservation, reservationUpdate)
     }
@@ -263,8 +264,7 @@ class ReservationTest {
 
     @Test
     fun testCancelReservationDoesNotExist() {
-        RestAssured.given()
-                .auth().oauth2(tokenJWT)
+        given().auth().oauth2(tokenJWT)
                 .contentType(ContentType.JSON)
                 .post("/api/reservation/cancel/0")
                 .then()

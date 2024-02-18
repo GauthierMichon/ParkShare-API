@@ -31,7 +31,8 @@ class GetAllUseCase {
             minRate: Double?,
             maxHourPrice: Double?,
             sortField: SortField?,
-            sortType: SortType?): List<Ad> {
+            sortType: SortType?,
+            onlyPublish: Boolean?): List<Ad> {
         val allAds =  adRepository.getAll()
         var filteredAds = allAds
 
@@ -69,6 +70,12 @@ class GetAllUseCase {
                 SortField.HOUR_PRICE -> sortAdsByHourPrice(filteredAds, sortType)
                 SortField.RATING -> sortAdsByRating(filteredAds, sortType)
                 SortField.DISTANCE -> sortAdsByDistance(filteredAds, sortType, latitude, longitude)
+            }
+        }
+
+        if (onlyPublish == true) {
+            filteredAds = filteredAds.filter { ad ->
+                ad.state
             }
         }
 
@@ -142,12 +149,12 @@ class GetAllUseCase {
             SortType.ASC -> ads.sortedBy { ad ->
                 val feedbacks = feedbackRepository.getListByAd(ad.id!!)
                 val averageRating = feedbacks.mapNotNull { it.rating }.average()
-                averageRating ?: Double.MIN_VALUE
+                averageRating
             }
             SortType.DESC -> ads.sortedByDescending { ad ->
                 val feedbacks = feedbackRepository.getListByAd(ad.id!!)
                 val averageRating = feedbacks.mapNotNull { it.rating }.average()
-                averageRating ?: Double.MAX_VALUE
+                averageRating
             }
         }
     }

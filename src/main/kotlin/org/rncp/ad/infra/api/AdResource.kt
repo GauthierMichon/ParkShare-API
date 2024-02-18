@@ -49,9 +49,10 @@ class AdResource {
             @QueryParam("minRate") minRate: Double?,
             @QueryParam("maxHourPrice") maxHourPrice: Double?,
             @QueryParam("sortField") sortField: SortField?,
-            @QueryParam("sortType") sortType: SortType?
+            @QueryParam("sortType") sortType: SortType?,
+            @QueryParam("onlyPublish") onlyPublish: Boolean?
     ): List<AdDto> {
-        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate, minRate, maxHourPrice, sortField, sortType)
+        val ads = getAllUseCase.execute(latitude, longitude, distance, beginDate, endDate, minRate, maxHourPrice, sortField, sortType, onlyPublish)
         return ads.map { ad ->
             val link = "/api/ads/${ad.id}"
             AdDto.fromAd(ad, link)

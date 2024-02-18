@@ -7,7 +7,6 @@ import org.rncp.ad.domain.model.Ad
 import org.rncp.ad.domain.ports.out.AdRepository
 import org.rncp.feedback.infra.db.FeedbackPostGreRepository
 import org.rncp.reservation.domain.model.Reservation
-import org.rncp.reservation.domain.ports.`in`.GetListByAdUseCase
 import org.rncp.reservation.domain.ports.out.ReservationRepository
 import org.rncp.user.infra.db.UserDAO
 import org.rncp.user.infra.db.UserPostGreRepository
@@ -40,16 +39,16 @@ class AdPostGreRepository : PanacheRepositoryBase<AdDao, Int>, AdRepository {
         return adDao.toAd()
     }
 
-    override fun update(ad: Ad) {
-        val adDao = findById(ad.id)
+    override fun update(adData: Ad) {
+        val adDao = findById(adData.id)
         adDao.apply {
-            name = ad.name
-            user = userRepository.find("uid", ad.userId).firstResult()
-            description = ad.description
-            hourPrice = ad.hourPrice
-            latitude = ad.latitude
-            longitude = ad.longitude
-            state = ad.state
+            name = adData.name
+            user = userRepository.find("uid", adData.userId).firstResult()
+            description = adData.description
+            hourPrice = adData.hourPrice
+            latitude = adData.latitude
+            longitude = adData.longitude
+            state = adData.state
         }
         persistAndFlush(adDao)
     }

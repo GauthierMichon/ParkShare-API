@@ -8,10 +8,7 @@ import jakarta.ws.rs.core.Context
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.core.SecurityContext
-import org.eclipse.microprofile.openapi.annotations.Operation
 import org.rncp.ad.domain.ports.`in`.GetAdByIdUseCase
-import org.rncp.ad.infra.api.AdDto
-import org.rncp.feedback.infra.api.FeedbackDTO
 import org.rncp.reservation.domain.model.Reservation
 import org.rncp.reservation.domain.ports.`in`.*
 import java.time.LocalDateTime
@@ -67,7 +64,7 @@ class ReservationResource {
     @Authenticated
     fun create(reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
         val userUid = securityContext.userPrincipal.name
-        val reservation = Reservation(null, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, reservationCreateOrUpdateDTO.statusId)
+        val reservation = Reservation(null, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, null, reservationCreateOrUpdateDTO.statusId)
 
         if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3 || getAdbyIdUseCase.execute(reservationCreateOrUpdateDTO.adId) == null) {
             return Response.status(Response.Status.BAD_REQUEST).build()
@@ -103,7 +100,7 @@ class ReservationResource {
     @Authenticated
     fun update(@PathParam("id") reservationId: Int, reservationCreateOrUpdateDTO: ReservationCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
         val userUid = securityContext.userPrincipal.name
-        val reservation = Reservation(reservationId, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, reservationCreateOrUpdateDTO.statusId)
+        val reservation = Reservation(reservationId, reservationCreateOrUpdateDTO.adId, userUid, reservationCreateOrUpdateDTO.beginDate, reservationCreateOrUpdateDTO.endDate, 0.0, reservationCreateOrUpdateDTO.statusId)
 
         if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.statusId < 1 || reservationCreateOrUpdateDTO.statusId > 3) {
             return Response.status(Response.Status.BAD_REQUEST).build()
