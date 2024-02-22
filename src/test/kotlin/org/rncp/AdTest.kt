@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.rncp.ad.infra.api.AdDto
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
 import org.rncp.feedback.infra.api.FeedbackCreateOrUpdateDTO
@@ -25,23 +26,27 @@ import java.time.Month
 
 @QuarkusTest
 class AdTest {
-    private var tokenJWT: String? = null
-
     @Inject
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
-    @BeforeEach
-    fun generateTokenJwt() {
-        val response = given()
-                .contentType(ContentType.JSON)
-                .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
-                .post("/api/user/authentication")
+    companion object {
+        @JvmStatic
+        private var tokenJWT: String? = null
 
-        val token = response.then()
-                .extract()
-                .jsonPath()
-                .getString("idToken")
+        @BeforeAll
+        @JvmStatic
+        fun setUp() {
+            val response = RestAssured.given()
+                    .contentType(ContentType.JSON)
+                    .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
+                    .post("/api/user/authentication")
 
-        tokenJWT = token
+            val token = response.then()
+                    .extract()
+                    .jsonPath()
+                    .getString("idToken")
+
+            tokenJWT = token
+        }
     }
 
     @Transactional

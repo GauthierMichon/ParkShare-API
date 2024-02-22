@@ -9,11 +9,11 @@ import jakarta.transaction.Transactional
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
 import org.rncp.ad.infra.api.AdDto
-import org.rncp.feedback.infra.api.FeedbackDTO
 import org.rncp.reservation.infra.api.ReservationCreateOrUpdateDTO
 import org.rncp.reservation.infra.api.ReservationDTO
 import org.rncp.reservation.infra.db.ReservationPostGreRepository
@@ -27,21 +27,26 @@ class ReservationTest {
 
     @Inject
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
-    private var tokenJWT: String? = null
 
-    @BeforeEach
-    fun generateTokenJwt() {
-        val response = given()
-                .contentType(ContentType.JSON)
-                .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
-                .post("/api/user/authentication")
+    companion object {
+        @JvmStatic
+        private var tokenJWT: String? = null
 
-        val token = response.then()
-                .extract()
-                .jsonPath()
-                .getString("idToken")
+        @BeforeAll
+        @JvmStatic
+        fun setUp() {
+            val response = RestAssured.given()
+                    .contentType(ContentType.JSON)
+                    .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
+                    .post("/api/user/authentication")
 
-        tokenJWT = token
+            val token = response.then()
+                    .extract()
+                    .jsonPath()
+                    .getString("idToken")
+
+            tokenJWT = token
+        }
     }
 
 
@@ -101,6 +106,21 @@ class ReservationTest {
         val expectedReservation = ReservationDTO(reservationGiven.id, adGiven.id!!, adGiven.userId, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 1351.2, 2)
 
         Assertions.assertEquals(expectedReservation, reservationEntity)
+    }
+
+    @Test
+    fun testGetByAdId() {
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+
+        val reservations = getReservationByAdId(adGiven.id)
+
+        Assertions.assertEquals(3, reservations.size)
     }
 
     @Test

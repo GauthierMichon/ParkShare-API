@@ -6,6 +6,7 @@ import io.restassured.http.ContentType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
@@ -18,21 +19,25 @@ import java.time.Month
 
 @QuarkusTest
 class FeedbackTest {
-    private var tokenJWT: String? = null
+    companion object {
+        @JvmStatic
+        private var tokenJWT: String? = null
 
-    @BeforeEach
-    fun generateTokenJwt() {
-        val response = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
-                .post("/api/user/authentication")
+        @BeforeAll
+        @JvmStatic
+        fun setUp() {
+            val response = RestAssured.given()
+                    .contentType(ContentType.JSON)
+                    .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
+                    .post("/api/user/authentication")
 
-        val token = response.then()
-                .extract()
-                .jsonPath()
-                .getString("idToken")
+            val token = response.then()
+                    .extract()
+                    .jsonPath()
+                    .getString("idToken")
 
-        tokenJWT = token
+            tokenJWT = token
+        }
     }
 
     private fun createAd(requestAd: AdCreateOrUpdateDTO): AdDto {
@@ -86,6 +91,21 @@ class FeedbackTest {
         val expectedFeedback = FeedbackDTO(feedbackGiven.id, adGiven.id!!, adGiven.userId, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
 
         Assertions.assertEquals(expectedFeedback, feedbackEntity)
+    }
+
+    @Test
+    fun testGetByAdId() {
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestFeedback = FeedbackCreateOrUpdateDTO(adGiven.id!!, 4, "Super", LocalDateTime.of(2023, Month.SEPTEMBER, 19, 19, 42, 13))
+        createFeedback(requestFeedback)
+        createFeedback(requestFeedback)
+        createFeedback(requestFeedback)
+
+        val feedbacks = getFeedbackByAdId(adGiven.id)
+
+        Assertions.assertEquals(3, feedbacks.size)
     }
 
     @Test
