@@ -37,6 +37,7 @@ class FeedbackResource {
 
     @GET
     @Path("/{id}")
+    @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     fun getById(@PathParam("id") adId: Int): Response {
         val feedback = getOneUseCase.execute(adId)
@@ -71,6 +72,7 @@ class FeedbackResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/ad/{adId}")
+    @Authenticated
     fun getListByAd(@PathParam("adId") adId: Int): List<FeedbackDTO> {
         val feedbacks = getListByAdUseCase.execute(adId)
         return feedbacks.map { FeedbackDTO.fromFeedback(it) }
@@ -81,6 +83,7 @@ class FeedbackResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{id}")
     @Transactional
+    @Authenticated
     fun update(@PathParam("id") feedbackId: Int, feedbackCreateOrUpdateDTO: FeedbackCreateOrUpdateDTO, @Context securityContext: SecurityContext): Response {
         val userUid = securityContext.userPrincipal.name
         val feedback = Feedback(feedbackId, feedbackCreateOrUpdateDTO.adId, userUid, feedbackCreateOrUpdateDTO.rating, feedbackCreateOrUpdateDTO.description, feedbackCreateOrUpdateDTO.date)
@@ -96,6 +99,7 @@ class FeedbackResource {
     @DELETE
     @Transactional
     @Path("/{id}")
+    @Authenticated
     fun delete(@PathParam("id") feedbackId: Int): Response {
         deleteUseCase.execute(feedbackId)
         return Response.noContent().build()

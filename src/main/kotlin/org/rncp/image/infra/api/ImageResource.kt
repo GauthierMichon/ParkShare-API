@@ -27,11 +27,9 @@ class ImageResource {
     @Inject
     lateinit var getOneUseCase: GetByIdUseCase
 
-    @Inject
-    lateinit var getAdbyIdUseCase: GetAdByIdUseCase
-
     @GET
     @Path("/{id}")
+    @Authenticated
     @Produces(MediaType.APPLICATION_JSON)
     fun getById(@PathParam("id") adId: Int): Response {
         val image = getOneUseCase.execute(adId)
@@ -57,6 +55,7 @@ class ImageResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/ad/{adId}")
+    @Authenticated
     fun getListByAd(@PathParam("adId") adId: Int): List<ImageDTO> {
         val images = getListByAdUseCase.execute(adId)
         return images.map { ImageDTO.fromImage(it) }
@@ -65,6 +64,7 @@ class ImageResource {
     @DELETE
     @Transactional
     @Path("/{id}")
+    @Authenticated
     fun delete(@PathParam("id") imageId: Int): Response {
         deleteUseCase.execute(imageId)
         return Response.noContent().build()

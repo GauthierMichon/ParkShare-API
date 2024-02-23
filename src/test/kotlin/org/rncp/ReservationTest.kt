@@ -28,27 +28,21 @@ class ReservationTest {
     @Inject
     lateinit var reservationPostGreRepository: ReservationPostGreRepository
 
-    companion object {
-        @JvmStatic
-        private var tokenJWT: String? = null
+    private var tokenJWT: String? = null
+    @BeforeEach
+    fun generateTokenJwt() {
+        val response = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
+                .post("/api/user/authentication")
 
-        @BeforeAll
-        @JvmStatic
-        fun setUp() {
-            val response = RestAssured.given()
-                    .contentType(ContentType.JSON)
-                    .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
-                    .post("/api/user/authentication")
+        val token = response.then()
+                .extract()
+                .jsonPath()
+                .getString("idToken")
 
-            val token = response.then()
-                    .extract()
-                    .jsonPath()
-                    .getString("idToken")
-
-            tokenJWT = token
-        }
+        tokenJWT = token
     }
-
 
     @Transactional
     fun clearReservations() {

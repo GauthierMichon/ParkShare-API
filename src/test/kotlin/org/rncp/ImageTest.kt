@@ -5,10 +5,7 @@ import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.rncp.ad.infra.api.AdCreateOrUpdateDTO
 import org.rncp.ad.infra.api.AdDto
 import org.rncp.user.infra.api.LoginDTO
@@ -17,25 +14,20 @@ import org.rncp.image.infra.api.ImageDTO
 
 @QuarkusTest
 class ImageTest {
-    companion object {
-        @JvmStatic
-        private var tokenJWT: String? = null
+    private var tokenJWT: String? = null
+    @BeforeEach
+    fun generateTokenJwt() {
+        val response = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
+                .post("/api/user/authentication")
 
-        @BeforeAll
-        @JvmStatic
-        fun setUp() {
-            val response = RestAssured.given()
-                    .contentType(ContentType.JSON)
-                    .body(Json.encodeToString(LoginDTO("hugobast33@gmail.com", "mypassword", true)))
-                    .post("/api/user/authentication")
+        val token = response.then()
+                .extract()
+                .jsonPath()
+                .getString("idToken")
 
-            val token = response.then()
-                    .extract()
-                    .jsonPath()
-                    .getString("idToken")
-
-            tokenJWT = token
-        }
+        tokenJWT = token
     }
 
     private fun createAd(requestAd: AdCreateOrUpdateDTO): AdDto {
