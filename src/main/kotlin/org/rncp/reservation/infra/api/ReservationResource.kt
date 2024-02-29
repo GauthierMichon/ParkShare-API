@@ -23,6 +23,9 @@ class ReservationResource {
     lateinit var getListByAdUseCase: GetListByAdUseCase
 
     @Inject
+    lateinit var getListByUserUseCase: GetListByUserUseCase
+
+    @Inject
     lateinit var updateUseCase: UpdateUseCase
 
     @Inject
@@ -80,6 +83,18 @@ class ReservationResource {
             @QueryParam("statusId") statusId: Int?
     ): List<ReservationDTO> {
         val reservations = getListByAdUseCase.execute(adId, statusId)
+        return reservations.map { ReservationDTO.fromReservation(it) }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/user/{userId}")
+    @Authenticated
+    fun getListByUser(
+            @PathParam("userId") userId: String,
+            @QueryParam("statusId") statusId: Int?
+    ): List<ReservationDTO> {
+        val reservations = getListByUserUseCase.execute(userId, statusId)
         return reservations.map { ReservationDTO.fromReservation(it) }
     }
 

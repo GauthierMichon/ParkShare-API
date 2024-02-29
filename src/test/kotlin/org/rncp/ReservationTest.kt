@@ -157,6 +157,68 @@ class ReservationTest {
     }
 
     @Test
+    fun testGetByUserId() {
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val adGiven = createAd(requestAd)
+
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+
+        val reservations = RestAssured.given().auth().oauth2(tokenJWT).get("/api/reservation/user/${adGiven.userId}")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", ReservationDTO::class.java)
+
+        Assertions.assertEquals(3, reservations.size)
+    }
+
+    @Test
+    fun testGetByUserIdWithStatus() {
+        clearReservations()
+        val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val adGiven = createAd(requestAd)
+
+
+        val requestReservation = ReservationCreateOrUpdateDTO(adGiven.id!!, LocalDateTime.of(2024, Month.SEPTEMBER, 19, 19, 42, 13), LocalDateTime.of(2024, Month.SEPTEMBER, 20, 19, 42, 13), 2)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+        createReservation(requestReservation)
+
+        val reservationsAccept = RestAssured.given().auth().oauth2(tokenJWT).get("/api/reservation/user/${adGiven.userId}?statusId=1")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", ReservationDTO::class.java)
+
+        val reservationsAwait = RestAssured.given().auth().oauth2(tokenJWT).get("/api/reservation/user/${adGiven.userId}?statusId=2")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", ReservationDTO::class.java)
+
+        val reservationsRefuse = RestAssured.given().auth().oauth2(tokenJWT).get("/api/reservation/user/${adGiven.userId}?statusId=3")
+                .then()
+                .statusCode(200)
+                .extract()
+                .body()
+                .jsonPath()
+                .getList(".", ReservationDTO::class.java)
+
+        Assertions.assertEquals(0, reservationsAccept.size)
+        Assertions.assertEquals(3, reservationsAwait.size)
+        Assertions.assertEquals(0, reservationsRefuse.size)
+    }
+
+    @Test
     fun testGetByStatus() {
         clearReservations()
         val requestAd = AdCreateOrUpdateDTO("Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
