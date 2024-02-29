@@ -37,6 +37,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.19.4")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.quarkus:quarkus-test-security")
     implementation("com.google.firebase:firebase-admin:9.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
