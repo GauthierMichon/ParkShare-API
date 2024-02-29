@@ -8,7 +8,6 @@ interface ReservationRepository {
     fun create(reservation: Reservation): Reservation
     fun getById(id: Int): Reservation?
     fun getListByAd(adId: Int): List<Reservation>
-    fun getListByStatus(statusId: Int): List<Reservation>
     fun accept(reservation: Reservation)
     fun cancel(reservation: Reservation)
     fun delete(id: Int)

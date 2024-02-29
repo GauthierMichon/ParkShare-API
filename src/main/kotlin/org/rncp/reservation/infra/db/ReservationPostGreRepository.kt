@@ -47,10 +47,6 @@ class ReservationPostGreRepository : PanacheRepositoryBase<ReservationDAO, Int> 
         return list("ad.id", adId).map { it.toReservation() }
     }
 
-    override fun getListByStatus(statusId: Int): List<Reservation> {
-        return list("status.id", statusId).map { it.toReservation() }
-    }
-
     override fun accept(reservation: Reservation) {
         val reservationDao = findById(reservation.id)
         reservationDao.apply {

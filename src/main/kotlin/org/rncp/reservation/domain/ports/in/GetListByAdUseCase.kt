@@ -10,7 +10,13 @@ class GetListByAdUseCase {
     @Inject
     lateinit var reservationRepository: ReservationRepository
 
-    fun execute(adId: Int): List<Reservation> {
-        return reservationRepository.getListByAd(adId)
+    fun execute(adId: Int, statusId: Int?): List<Reservation> {
+        val allReservations = reservationRepository.getListByAd(adId)
+
+        return if (statusId != null) {
+            allReservations.filter { it.statusId == statusId }
+        } else {
+            allReservations
+        }
     }
 }
