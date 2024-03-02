@@ -29,9 +29,19 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("io.quarkus:quarkus-arc")
     implementation("io.quarkus:quarkus-resteasy-reactive")
+    implementation("org.testcontainers:postgresql:1.16.3")
+    implementation("io.quarkus:quarkus-jdbc-h2")
+    implementation("javax.persistence:javax.persistence-api:2.2")
+    testImplementation("io.quarkus:quarkus-test-h2")
+    testImplementation("io.quarkus:quarkus-test-common")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.4")
     testImplementation("io.quarkus:quarkus-junit5")
     testImplementation("io.rest-assured:rest-assured")
+    testImplementation("io.quarkus:quarkus-test-security")
+    implementation("com.google.firebase:firebase-admin:9.0.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
 }
+
 
 group = "org.rncp"
 version = "1.0.0-SNAPSHOT"
@@ -43,6 +53,9 @@ java {
 
 tasks.withType<Test> {
     systemProperty("java.util.logging.manager", "org.jboss.logmanager.LogManager")
+
+    // Définissez le profil de test pour utiliser le fichier application-test.properties
+    systemProperty("quarkus.profile", "test")
 }
 allOpen {
     annotation("jakarta.ws.rs.Path")

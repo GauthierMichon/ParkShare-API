@@ -1,83 +1,19 @@
-# ParkShare Android
+# Configuration nécessaire pour lancer l'application
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+- [JDK Java version 21](insérer lien)
+- [Quarkus](https://quarkus.io/guides/cli-tooling)
+- [Docker](insérer lien)
 
-If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+## Comment lancer l'application :
 
-## Running the application in dev mode
+1. Ouvrez un terminal.
+2. Accédez au dossier `src\main\docker\dockerBDD`.
+3. Exécutez la commande `docker compose up`.
 
-You can run your application in dev mode that enables live coding using:
+Ensuite, dans un nouveau terminal, lancez la commande `./gradlew quarkusDev`.
 
-```shell script
-./gradlew quarkusDev
-```
+Les routes de l'API nécessitent une authentification. Pour cela, utilisez d'abord la route `/register`, puis `/authentication`, qui vous fournira un token permettant l'accès aux autres routes.
 
-> **_NOTE:_** Quarkus now ships with a Dev UI, which is available in dev mode only at http://localhost:8080/q/dev/.
+## Accéder à la documentation Swagger :
 
-## Packaging and running the application
-
-The application can be packaged using:
-
-```shell script
-./gradlew build
-```
-
-It produces the `quarkus-run.jar` file in the `build/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `build/quarkus-app/lib/` directory.
-
-The application is now runnable using `java -jar build/quarkus-app/quarkus-run.jar`.
-
-If you want to build an _über-jar_, execute the following command:
-
-```shell script
-./gradlew build -Dquarkus.package.type=uber-jar
-```
-
-The application, packaged as an _über-jar_, is now runnable using `java -jar build/*-runner.jar`.
-
-## Creating a native executable
-
-You can create a native executable using:
-
-```shell script
-./gradlew build -Dquarkus.package.type=native
-```
-
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
-
-```shell script
-./gradlew build -Dquarkus.package.type=native -Dquarkus.native.container-build=true
-```
-
-You can then execute your native executable with: `./build/park-share-1.0.0-SNAPSHOT-runner`
-
-If you want to learn more about building native executables, please consult https://quarkus.io/guides/gradle-tooling.
-
-## Related Guides
-
-- Hibernate Validator ([guide](https://quarkus.io/guides/validation)): Validate object properties (field, getter) and method parameters for your beans (REST, CDI, Jakarta Persistence)
-- SmallRye OpenAPI ([guide](https://quarkus.io/guides/openapi-swaggerui)): Document your REST APIs with OpenAPI - comes with Swagger UI
-- Kotlin ([guide](https://quarkus.io/guides/kotlin)): Write your services in Kotlin
-- WebSockets ([guide](https://quarkus.io/guides/websockets)): WebSocket communication channel support
-- SmallRye JWT ([guide](https://quarkus.io/guides/security-jwt)): Secure your applications with JSON Web Token
-- SmallRye GraphQL ([guide](https://quarkus.io/guides/smallrye-graphql)): Create GraphQL Endpoints using the code-first approach from MicroProfile GraphQL
-
-## Provided Code
-
-### RESTEasy Reactive
-
-Easily start your Reactive RESTful Web Services
-
-[Related guide section...](https://quarkus.io/guides/getting-started-reactive#reactive-jax-rs-resources)
-
-### SmallRye GraphQL
-
-Start coding with this Hello GraphQL Query
-
-[Related guide section...](https://quarkus.io/guides/smallrye-graphql)
-
-### WebSockets
-
-WebSocket communication channel starter code
-
-[Related guide section...](https://quarkus.io/guides/websockets)
+Après avoir lancer l'application, rendez-vous sur cette [URL](http://localhost:8080/q/swagger-ui/#/).
