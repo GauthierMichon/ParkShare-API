@@ -3,6 +3,7 @@ package org.rncp.firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseToken
 import com.google.firebase.auth.UserRecord
+import com.google.firebase.auth.UserRecord.UpdateRequest
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
 import org.rncp.user.domain.model.User
@@ -15,22 +16,33 @@ class FirebaseService {
     private lateinit var userRepository: UserRepository
 
     class FirebaseAuthException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
-    fun authenticate(email: String, password: String): String? {
-//        try {
-//            val authResult = FirebaseAuth.getInstance()
-//
-//            val existingUser = userRepository.getByIdUid(uid)
-//
-//            if (existingUser != null) {
-//                return existingUser
-//            } else {
-//                throw FirebaseAuthException("L'utilisateur avec cet UID n'existe pas.")
-//            }
-//        } catch (e: FirebaseAuthException) {
-//            throw FirebaseAuthException("Erreur d'authentification : ${e.message}", e)
-//        }
 
-        return ""
+    fun updatePwd(uid: String, pwd: String) {
+        val request = UpdateRequest(uid).setPassword(pwd)
+        FirebaseAuth.getInstance().updateUser(request)
+    }
+
+    fun refreshToken(uid: String): String? {
+        return try {
+            val customClaims = mapOf<String, Any>()
+            FirebaseAuth.getInstance().createCustomToken(uid, customClaims)
+        } catch (e: FirebaseAuthException) {
+            println("Erreur lors de la génération du token: ${e.message}")
+            null
+        }
+    }
+
+    fun updateEmail(uid: String, email: String) {
+        val user = FirebaseAuth.getInstance().getUser(uid)
+
+        if (user.email != email) {
+            val request = UpdateRequest(uid).setEmail(email)
+            FirebaseAuth.getInstance().updateUser(request)
+        }
+    }
+
+    fun deleteUser(uid: String) {
+        FirebaseAuth.getInstance().deleteUser(uid)
     }
 
 

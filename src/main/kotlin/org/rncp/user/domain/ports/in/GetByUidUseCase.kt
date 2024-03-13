@@ -10,7 +10,7 @@ class GetByUidUseCase {
     @Inject
     private lateinit var userRepository: UserRepository
 
-    fun execute(uid: String): User {
+    fun execute(uid: String): User? {
         return userRepository.getByUid(uid)
     }
 }

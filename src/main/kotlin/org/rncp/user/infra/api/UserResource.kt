@@ -11,10 +11,7 @@ import okhttp3.MediaType as okhttp3MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.rncp.user.domain.model.User
-import org.rncp.user.domain.ports.`in`.DeleteUseCase
-import org.rncp.user.domain.ports.`in`.LoginUseCase
-import org.rncp.user.domain.ports.`in`.RegisterUseCase
-import org.rncp.user.domain.ports.`in`.UpdateUseCase
+import org.rncp.user.domain.ports.`in`.*
 
 
 @Path("/api/user")
@@ -31,6 +28,12 @@ class UserResource {
 
     @Inject
     lateinit var deleteUseCase: DeleteUseCase
+
+    @Inject
+    lateinit var updatePwdUseCase: UpdatePwdUseCase
+
+    @Inject
+    lateinit var refreshJwtUseCase: RefreshJwtUseCase
 
     @POST
     @Path("/register")
@@ -88,5 +91,24 @@ class UserResource {
     }
 
 
+    @PATCH
+    @Path("/changepwd/{uid}")
+    @Authenticated
+    fun changePwd(@PathParam("uid") userUid: String, userUpdatePwdDTO: UserUpdatePwdDTO):Response {
+        return updatePwdUseCase.execute(userUid, userUpdatePwdDTO.password)
+    }
 
+
+    @POST
+    @Path("refreshjwt/{uid}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Authenticated
+    fun refreshJwt(@PathParam("uid") userUid: String): Response {
+        val newToken = refreshJwtUseCase.execute(userUid)
+        return Response.ok().entity("""
+            {
+                "jwttoken": "$newToken"
+            }
+        """.trimIndent()).build()
+    }
 }
