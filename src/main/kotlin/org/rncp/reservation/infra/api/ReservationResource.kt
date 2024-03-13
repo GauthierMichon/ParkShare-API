@@ -111,7 +111,7 @@ class ReservationResource {
         if (reservationCreateOrUpdateDTO.endDate.isBefore(reservationCreateOrUpdateDTO.beginDate) || reservationCreateOrUpdateDTO.beginDate.isBefore(LocalDateTime.now()) || reservationCreateOrUpdateDTO.endDate.isBefore(LocalDateTime.now())) {
             return Response.status(Response.Status.BAD_REQUEST).build()
         }
-        return updateUseCase.execute(reservationId, reservation)
+        return updateUseCase.execute(reservation)
     }
 
     @POST

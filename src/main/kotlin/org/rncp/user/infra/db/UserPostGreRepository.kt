@@ -16,4 +16,19 @@ class UserPostGreRepository: PanacheRepositoryBase<UserDAO, Int>, UserRepository
         persist(userDAO)
         return userDAO.toUser()
     }
+
+    override fun update(userData: User) {
+        val user = find("uid", userData.uid).firstResult<UserDAO>()
+        user.apply {
+            firstname = userData.firstname
+            lastname = userData.lastname
+            email = userData.email
+            roleId = userData.roleId
+        }
+    }
+
+    override fun delete(userUid: String) {
+        val user = find("uid", userUid).firstResult<UserDAO>()
+        delete(user)
+    }
 }

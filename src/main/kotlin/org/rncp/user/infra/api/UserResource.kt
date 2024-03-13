@@ -1,11 +1,9 @@
 package org.rncp.user.infra.api
 
+import io.quarkus.security.Authenticated
 import jakarta.inject.Inject
 import jakarta.transaction.Transactional
-import jakarta.ws.rs.Consumes
-import jakarta.ws.rs.POST
-import jakarta.ws.rs.Path
-import jakarta.ws.rs.Produces
+import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import okhttp3.OkHttpClient
@@ -13,8 +11,10 @@ import okhttp3.MediaType as okhttp3MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.rncp.user.domain.model.User
+import org.rncp.user.domain.ports.`in`.DeleteUseCase
 import org.rncp.user.domain.ports.`in`.LoginUseCase
 import org.rncp.user.domain.ports.`in`.RegisterUseCase
+import org.rncp.user.domain.ports.`in`.UpdateUseCase
 
 
 @Path("/api/user")
@@ -25,6 +25,12 @@ class UserResource {
 
     @Inject
     lateinit var loginUseCase: LoginUseCase
+
+    @Inject
+    lateinit var updateUseCase: UpdateUseCase
+
+    @Inject
+    lateinit var deleteUseCase: DeleteUseCase
 
     @POST
     @Path("/register")
@@ -61,4 +67,26 @@ class UserResource {
                 .entity(responseBody)
                 .build()
     }
+
+    @PUT
+    @Path("/{uid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
+    @Authenticated
+    fun update(@PathParam("uid") userUid: String, userUpdateDTO: UserUpdateDTO): Response {
+        val user = User(userUid, userUpdateDTO.firstname, userUpdateDTO.lastname, userUpdateDTO.email, userUpdateDTO.roleId)
+        return updateUseCase.execute(user)
+    }
+
+    @DELETE
+    @Path("/{uid}")
+    @Transactional
+    @Authenticated
+    fun delete(@PathParam("uid") userUid: String): Response {
+        deleteUseCase.execute(userUid)
+        return Response.noContent().build()
+    }
+
+
+
 }

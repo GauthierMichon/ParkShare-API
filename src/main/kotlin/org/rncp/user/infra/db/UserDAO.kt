@@ -8,11 +8,11 @@ import org.rncp.user.domain.model.User
 @Table(name="app_user")
 data class UserDAO(
         @Id
-        val uid: String,
-        val firstname: String,
-        val lastname: String,
-        val email: String,
-        val roleId: Int,
+        var uid: String,
+        var firstname: String,
+        var lastname: String,
+        var email: String,
+        var roleId: Int,
 ): PanacheEntityBase() {
     constructor(): this("", "", "", "", 0)
 
