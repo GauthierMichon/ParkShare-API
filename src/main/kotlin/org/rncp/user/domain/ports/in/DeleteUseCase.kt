@@ -2,15 +2,19 @@ package org.rncp.user.domain.ports.`in`
 
 import jakarta.enterprise.context.ApplicationScoped
 import jakarta.inject.Inject
-import org.rncp.user.domain.model.User
+import org.rncp.firebase.FirebaseService
 import org.rncp.user.domain.ports.out.UserRepository
 
 @ApplicationScoped
-class GetByUidUseCase {
+class DeleteUseCase {
     @Inject
     private lateinit var userRepository: UserRepository
 
-    fun execute(uid: String): User? {
-        return userRepository.getByUid(uid)
+    @Inject
+    private lateinit var firebaseService: FirebaseService
+
+    fun execute(userUid: String) {
+        firebaseService.deleteUser(userUid)
+        userRepository.delete(userUid)
     }
 }

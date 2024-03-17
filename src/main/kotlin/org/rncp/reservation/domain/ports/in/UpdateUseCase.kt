@@ -11,8 +11,8 @@ class UpdateUseCase {
     @Inject
     private lateinit var reservationRepository: ReservationRepository
 
-    fun execute(reservationId: Int, reservationData: Reservation): Response {
-        val reservation = reservationRepository.getById(reservationId)
+    fun execute(reservationData: Reservation): Response {
+        val reservation = reservationRepository.getById(reservationData.id!!)
         return if (reservation != null) {
             reservationRepository.update(reservationData)
             Response.status(Response.Status.NO_CONTENT).build()
