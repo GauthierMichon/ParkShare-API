@@ -1,8 +1,8 @@
 # Configuration nécessaire pour lancer l'application
 
-- [JDK Java version 21](insérer lien)
+- [JDK Java version 21](https://www.oracle.com/fr/java/technologies/downloads/)
 - [Quarkus](https://quarkus.io/guides/cli-tooling)
-- [Docker](insérer lien)
+- [Docker](https://docs.docker.com/get-docker/)
 
 ## Comment lancer l'application :
 
