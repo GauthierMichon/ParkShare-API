@@ -117,7 +117,7 @@ class AdTest {
         val adGiven = createAd(requestAd)
         val adEntity = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "xau0If5kFubYSQBOG5y6I6vpMK73", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
+        val expectedAd = AdDto(adGiven.id, "8yk8My4TXZZPNkXOhAIki4y1iP83", "Gauthier Ad", "Description de test", 56.3, -0.2562456, 30.295626, true, "")
 
         assertEquals(expectedAd, adEntity)
     }
@@ -424,7 +424,7 @@ class AdTest {
 
         val adUpdate = getAdById(adGiven.id)
 
-        val expectedAd = AdDto(adGiven.id, "xau0If5kFubYSQBOG5y6I6vpMK73", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
+        val expectedAd = AdDto(adGiven.id, "8yk8My4TXZZPNkXOhAIki4y1iP83", "Gauthier Ad Update", "Description de test Update", 25.8, -0.2569191, 30.281220, false, "")
 
         assertEquals(expectedAd, adUpdate)
     }
