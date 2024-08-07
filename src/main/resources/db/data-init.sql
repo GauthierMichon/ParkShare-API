@@ -7,9 +7,9 @@ INSERT INTO app_user (uid, firstname, lastname, email, roleId) VALUES
 ('8yk8My4TXZZPNkXOhAIki4y1iP83', 'hugo', 'barbaste', 'hugobast33@gmail.com', 2);
 
 INSERT INTO ad (hourprice, state, description, latitude, longitude, name, userId) VALUES
-(2.0, true, 'coucou', 2.01285895, -2.095629599, 'test', '8yk8My4TXZZPNkXOhAIki4y1iP83'),
-(2.0, true, 'coucou2', 2.01285895, -2.095629599, 'test2', '8yk8My4TXZZPNkXOhAIki4y1iP83'),
-(2.0, true, 'coucou3', 2.01285895, -2.095629599, 'test3', '8yk8My4TXZZPNkXOhAIki4y1iP83');
+(4.0, true, 'coucou', 2.01285895, -2.495629599, 'test', '8yk8My4TXZZPNkXOhAIki4y1iP83'),
+(1.0, true, 'coucou2', 2.01285895, -2.095629599, 'test2', '8yk8My4TXZZPNkXOhAIki4y1iP83'),
+(5.0, true, 'coucou3', 2.01285895, -2.295629599, 'test3', '8yk8My4TXZZPNkXOhAIki4y1iP83');
 
 INSERT INTO reservation (ad, status, beginDate, endDate, totalPrice, userId) VALUES
 (1, 1, '2022-06-12', '2022-06-16', 0.0, '8yk8My4TXZZPNkXOhAIki4y1iP83'),
