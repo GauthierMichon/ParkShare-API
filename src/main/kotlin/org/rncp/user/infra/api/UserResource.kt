@@ -10,6 +10,8 @@ import okhttp3.OkHttpClient
 import okhttp3.MediaType as okhttp3MediaType
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.rncp.ad.domain.ports.`in`.GetAdByIdUseCase
+import org.rncp.ad.infra.api.AdDto
 import org.rncp.user.domain.model.User
 import org.rncp.user.domain.ports.`in`.*
 
@@ -22,6 +24,9 @@ class UserResource {
 
     @Inject
     lateinit var loginUseCase: LoginUseCase
+
+    @Inject
+    lateinit var getOneUseCase: GetByUidUseCase
 
     @Inject
     lateinit var updateUseCase: UpdateUseCase
@@ -69,6 +74,21 @@ class UserResource {
         return Response.status(response.code())
                 .entity(responseBody)
                 .build()
+    }
+
+    @GET
+    @Path("/{uid}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Transactional
+    @Authenticated
+    fun getByUid(@PathParam("uid") userUid: String): Response {
+        val user = getOneUseCase.execute(userUid)
+
+        return if (user != null) {
+            Response.ok(UserDTO.fromUser(user)).build()
+        } else {
+            Response.status(Response.Status.NOT_FOUND).build()
+        }
     }
 
     @PUT
